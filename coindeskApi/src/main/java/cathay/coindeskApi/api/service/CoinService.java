@@ -1,37 +1,218 @@
 package cathay.coindeskApi.api.service;
 
+import static cathay.coindeskApi.util.StringUtil.doubleQuoteString;
+
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import cathay.coindeskApi.api.entity.CoinType;
 import cathay.coindeskApi.api.repository.CoinTypeRepository;
+import cathay.coindeskApi.util.JsonUtil;
 
 @Service
 public class CoinService {
 
+	private static DecimalFormat CurrencyFormat = new DecimalFormat("#,##0.0000");
+	
 	@Autowired
 	private CoinTypeRepository coinTypeRepository;
 	
 	public List<CoinType> getAllCoinTypes() {
+		List<CoinType> resultList = null;
+		try {
+			resultList = coinTypeRepository.findAll();
+		}
+		finally {
+			String s = null;
+			if (resultList != null)
+				s = JsonUtil.getJsonString(resultList, true);
+			System.out.println("--> all coin types: " + s);
+		}
 		return coinTypeRepository.findAll();
 	}
 	
-	public CoinType getCoin(String code) {
-		return coinTypeRepository.findByCode(code).orElse(null);
+	public CoinType getCoinType(String code) {
+		CoinType coinType = null;
+		try {
+			coinType = coinTypeRepository.findByCode(code).orElse(null);
+		}
+		finally {
+			String s = null;
+			if (coinType != null)
+				s = JsonUtil.getJsonString(coinType, true);
+			System.out.println("--> get coin type: " + s);
+		}
+		return coinType;
 	}
 	
 	public CoinType addCoinType(CoinType coinType) {
-		if (coinType.getUpdated() == null)
-			coinType.setUpdated(new Date());
-		return coinTypeRepository.save(coinType);
+		CoinType coinType_ = null;
+		try {
+			if (coinTypeRepository.existsById(coinType.getCode())) {
+				throw new IllegalStateException("該coinType已存在: " + doubleQuoteString(coinType.getCode()));
+			}
+			coinType_ = coinTypeRepository.save(coinType);	
+		}
+		finally {
+			String s = null;
+			if (coinType_ != null)
+				s = JsonUtil.getJsonString(coinType_, true);
+			System.out.println("--> added coin type: " + s);
+		}
+		return coinType_;
 	}
 	
+	@Transactional
+	public Integer updateSymbol(String coinCode, String symbol) {
+		Integer rowsAffected = 0;
+		try {
+			rowsAffected = coinTypeRepository.updateSymbol(coinCode, symbol);
+		} finally {
+			System.out.println("--> rowsAffected: " + rowsAffected + "\n");
+		}
+		return rowsAffected;
+	}
+	
+	@Transactional
+	public CoinType updateSymbolAndGet(String coinCode, String symbol) {
+		CoinType coinType = null;
+		try {
+			if (updateSymbol(coinCode, symbol) <= 0) {
+				return null;
+			}
+			coinType = coinTypeRepository.findById(coinCode).orElse(null);
+		}
+		finally {
+			String s = null;
+			if (coinType != null)
+				s = JsonUtil.getJsonString(coinType, true);
+			System.out.println("--> updated coin type: " + s + "\n");
+		}
+		return coinType;
+	}
+	
+	@Transactional
+	@Async("taskExecutor")
+	public int updateRate(String coinCode, Double rate) {
+		return updateRate(coinCode, new BigDecimal(rate));
+	}
+	
+	@Transactional
+	public Integer updateRate(String coinCode, BigDecimal rate) {
+		int rowsAffected = 0;
+		try {
+			rowsAffected = coinTypeRepository.updateRate(coinCode, CurrencyFormat.format(rate), rate);
+		} finally {
+			System.out.println("--> rowsAffected: " + rowsAffected + "\n");
+		}
+		return rowsAffected;
+	}
+	
+	@Transactional
+	public CoinType updateRateAndGet(String coinCode, Double rate) {
+		return updateRateAndGet(coinCode, new BigDecimal(rate));
+	}
+	
+	@Transactional
+	public CoinType updateRateAndGet(String coinCode, BigDecimal rate) {
+		CoinType coinType = null;
+		try {
+			if (updateRate(coinCode, rate) <= 0) {
+				return null;
+			}
+			coinType = coinTypeRepository.findById(coinCode).orElse(null);
+		}
+		finally {
+			String s = null;
+			if (coinType != null)
+				s = JsonUtil.getJsonString(coinType, true);
+			System.out.println("--> updated coin type: " + s + "\n");
+		}
+		return coinType;
+	}
+
+	
+	@Transactional
+	public int updateDescription(String coinCode, String description) {
+		int rowsAffected = 0;
+		try {
+			rowsAffected = coinTypeRepository.updateDescription(coinCode, description);
+		} finally {
+			System.out.println("--> rowsAffected: " + rowsAffected + "\n");
+		}
+		return rowsAffected;
+	}
+	
+	@Transactional
+	public int updateDescription(String coinCode, String description, String descriptionCh) {
+		int rowsAffected = 0;
+		try {
+			rowsAffected = coinTypeRepository.updateDescription(coinCode, description, descriptionCh);
+		} finally {
+			System.out.println("--> rowsAffected: " + rowsAffected + "\n");
+		}
+		return rowsAffected;
+	}
+	
+	@Transactional
+	public CoinType updateDescriptionAndGet(String coinCode, String description) {
+		CoinType coinType = null;
+		try {
+			if (updateDescription(coinCode, description) <= 0) {
+				return null;
+			}
+			coinType = coinTypeRepository.findById(coinCode).orElse(null);
+		}
+		finally {
+			String s = null;
+			if (coinType != null)
+				s = JsonUtil.getJsonString(coinType, true);
+			System.out.println("--> updated coin type: " + s + "\n");
+		}
+		return coinType;
+	}
+	
+	@Transactional
+	public CoinType updateDescriptionAndGet(String coinCode, String description, String descriptionCh) {
+		CoinType coinType = null;
+		try {
+			if (updateDescription(coinCode, description, descriptionCh) <= 0) {
+				return null;
+			}
+			coinType = coinTypeRepository.findById(coinCode).orElse(null);
+		}
+		finally {
+			String s = null;
+			if (coinType != null)
+				s = JsonUtil.getJsonString(coinType, true);
+			System.out.println("--> updated coin type: " + s + "\n");
+		}
+		return coinType;
+	}	
+	
+	@Transactional
 	public CoinType updateCoinType(CoinType coinType) {
-		if (coinType.getUpdated() == null)
-			coinType.setUpdated(new Date());
+		CoinType coinType_ = null;
+		try {			
+			if (coinTypeRepository.existsById(coinType.getCode())) {
+				if (coinType.getUpdated() == null)
+					coinType.setUpdated(new Date());
+				coinType_ = coinTypeRepository.save(coinType);
+			}
+		}
+		finally {
+			String s = null;
+			if (coinType_ != null)
+				s = JsonUtil.getJsonString(coinType_, true);
+			System.out.println("--> updated coin type: " + s + "\n");
+		}
 		return coinTypeRepository.save(coinType);
 	}
 }
