@@ -10,6 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.DynamicUpdate;
+
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -17,6 +19,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @Entity
 @Table(name = "coin_type")
+@DynamicUpdate
 public class CoinType implements Serializable {
 	@Id
 	@PrimaryKeyJoinColumn
