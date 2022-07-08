@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +20,18 @@ import cathay.coindeskApi.util.JsonUtil;
 @Service
 public class CoinService {
 
-	private static DecimalFormat CurrencyFormat = new DecimalFormat("#,##0.0000");
+	private static DecimalFormat CurrencyFormat;
+	
+	@Autowired
+	private InjectionHelper injectionHelper;
+	
+	@Component
+	private static class InjectionHelper {
+		@Autowired
+		public void setCurrencyFormat(DecimalFormat currencyFormat) {
+			CoinService.CurrencyFormat = currencyFormat;
+		}
+	}
 	
 	@Autowired
 	private CoinTypeRepository coinTypeRepository;

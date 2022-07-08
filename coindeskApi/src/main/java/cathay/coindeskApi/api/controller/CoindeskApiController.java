@@ -30,13 +30,7 @@ public class CoindeskApiController {
 		
 		if (coinTypes != null) {
 			for (CoinType c : coinTypes) {
-				Coin coin = new Coin()
-				.setCode(c.getCode())
-				.setSymbol(c.getSymbol())
-				.setRate(c.getRate())
-				.setDescription(c.getDescription())
-				.setDescriptionChinese(c.getDescriptionChinese())
-				.setRateFloat(c.getRateFloat());
+				Coin coin = new Coin(c.getCode(), c.getSymbol(), c.getRateFloat(), c.getDescription(), c.getDescriptionChinese());
 				response.addBpi(c.getCode(), coin);
 			}
 		}
