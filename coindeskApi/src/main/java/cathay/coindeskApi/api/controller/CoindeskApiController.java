@@ -27,16 +27,18 @@ public class CoindeskApiController {
 			"This data was produced from the CoinDesk Bitcoin Price Index (USD). " +
 			"Non-USD currency data converted using hourly conversion rate from openexchangerates.org")
 		.setChartName("Bitcoin");
-			
-		for (CoinType c : coinTypes) {
-			Coin coin = new Coin()
-			.setCode(c.getCode())
-			.setSymbol(c.getSymbol())
-			.setRate(c.getRate())
-			.setDescription(c.getDescription())
-			.setDescriptionChinese(c.getDescriptionChinese())
-			.setRateFloat(c.getRateFloat());
-			response.addBpi(c.getCode(), coin);
+		
+		if (coinTypes != null) {
+			for (CoinType c : coinTypes) {
+				Coin coin = new Coin()
+				.setCode(c.getCode())
+				.setSymbol(c.getSymbol())
+				.setRate(c.getRate())
+				.setDescription(c.getDescription())
+				.setDescriptionChinese(c.getDescriptionChinese())
+				.setRateFloat(c.getRateFloat());
+				response.addBpi(c.getCode(), coin);
+			}
 		}
 		return ResponseEntity.ok(response);
 	}
