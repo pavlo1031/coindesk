@@ -13,9 +13,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 @Data
+@ToString(exclude = {"injectHelper"})
 @Accessors(chain = true)
 public class Coin implements Serializable {
 
