@@ -54,6 +54,10 @@ public class Coin implements Serializable {
 	@JsonProperty("rate_float")
 	private BigDecimal rateFloat;
 	
+	public Coin() {
+		
+	}
+	
 	public Coin(String code, String symbol, Double rateFloat) {
 		this(code, symbol, new BigDecimal(rateFloat), null, null);
 	}
