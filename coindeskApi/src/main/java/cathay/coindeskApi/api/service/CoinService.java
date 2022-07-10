@@ -63,6 +63,38 @@ public class CoinService {
 		}
 		return coinType;
 	}
+
+	public CoinType addCoinType(String coinCode, String symbol, BigDecimal rateFloat) {
+		return addCoinType(coinCode, symbol, rateFloat, null, null);
+	}
+	
+	public CoinType addCoinType(String coinCode, String symbol, BigDecimal rateFloat, String description) {
+		return addCoinType(coinCode, symbol, rateFloat, description, null);
+	}
+	
+	public CoinType addCoinType(String coinCode, String symbol, Double rateFloat) {
+		return addCoinType(coinCode, symbol, new BigDecimal(rateFloat), null, null);
+	}
+	
+	public CoinType addCoinType(String coinCode, String symbol, Double rateFloat, String description) {
+		return addCoinType(coinCode, symbol, new BigDecimal(rateFloat), description, null);
+	}
+	
+	public CoinType addCoinType(String coinCode, String symbol, Double rateFloat, String description, String descriptionChinese) {
+		return addCoinType(coinCode, symbol, new BigDecimal(rateFloat), description, descriptionChinese);
+	}
+	
+	public CoinType addCoinType(String coinCode, String symbol, BigDecimal rateFloat, String description, String descriptionChinese) {
+		CoinType coinType = new CoinType()
+		.setCode(coinCode)
+		.setSymbol(coinCode)
+		.setRate(CurrencyFormat.format(rateFloat))
+		.setRateFloat(rateFloat)
+		.setDescription(description)
+		.setDescriptionChinese(descriptionChinese);
+		return addCoinType(coinType);
+	}
+	
 	
 	public CoinType addCoinType(CoinType coinType) {
 		CoinType coinType_ = null;
@@ -70,7 +102,11 @@ public class CoinService {
 			if (coinTypeRepository.existsById(coinType.getCode())) {
 				throw new IllegalStateException("該coinType已存在: " + doubleQuoteString(coinType.getCode()));
 			}
-			coinType_ = coinTypeRepository.save(coinType);	
+			
+			if (coinType.getUpdated() == null)
+				coinType.setUpdated(new Date());
+			
+			coinType_ = coinTypeRepository.save(coinType);
 		}
 		finally {
 			String s = null;
