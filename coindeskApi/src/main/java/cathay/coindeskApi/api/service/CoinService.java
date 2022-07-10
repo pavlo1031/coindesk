@@ -87,7 +87,7 @@ public class CoinService {
 	public CoinType addCoinType(String coinCode, String symbol, BigDecimal rateFloat, String description, String descriptionChinese) {
 		CoinType coinType = new CoinType()
 		.setCode(coinCode)
-		.setSymbol(coinCode)
+		.setSymbol(symbol)
 		.setRate(CurrencyFormat.format(rateFloat))
 		.setRateFloat(rateFloat)
 		.setDescription(description)
