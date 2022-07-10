@@ -133,6 +133,7 @@ public class CoinService {
 				return returnVal = (get)? coinType : 0;
 
 			if (!get) { 
+				// 目前作法是: update time在JPQL中更新
 				returnVal = coinTypeRepository.updateSymbol(coinCode, symbol);
 			}
 			else {
