@@ -117,33 +117,58 @@ public class CoinService {
 		return coinType_;
 	}
 	
+	private Object updateSymbol(String coinCode, String symbol, boolean get) {
+		Object returnVal = null;
+		CoinType coinType = null;
+		
+		// 1. find
+		coinType = coinTypeRepository.findById(coinCode).orElse(null);
+		if (coinType == null)
+			throw new IllegalStateException("無法更新symbol欄位, 該筆資料不存在, coinCode = " + coinCode);
+
+		// 2. update
+		Throwable error = null;
+		try {
+			if (coinType.getSymbol().equals(symbol))
+				return returnVal = (get)? coinType : 0;
+
+			if (!get) { 
+				returnVal = coinTypeRepository.updateSymbol(coinCode, symbol);
+			}
+			else {
+				coinType.setSymbol(symbol);
+				coinType.setUpdated(new Date());
+				returnVal = coinTypeRepository.save(coinType);
+			}
+			return returnVal;
+		}
+		catch (Throwable t) {
+			error = t;
+			// 記錄錯誤
+			return returnVal = coinType;
+		}
+		finally {
+			if (!get) {
+				Integer rowsAffected = (Integer) returnVal;
+				System.out.println("--> rowsAffected: " + rowsAffected + "\n");
+			} else {
+				coinType = (CoinType) returnVal;
+				String s = null;
+				if (coinType != null)
+					s = JsonUtil.getJsonString(coinType, true);
+				System.out.println("--> updated coin type: " + s + "\n");
+			}
+		}
+	}
+	
 	@Transactional
 	public Integer updateSymbol(String coinCode, String symbol) {
-		Integer rowsAffected = 0;
-		try {
-			rowsAffected = coinTypeRepository.updateSymbol(coinCode, symbol);
-		} finally {
-			System.out.println("--> rowsAffected: " + rowsAffected + "\n");
-		}
-		return rowsAffected;
+		return (Integer) updateSymbol(coinCode, symbol, false);
 	}
 	
 	@Transactional
 	public CoinType updateSymbolAndGet(String coinCode, String symbol) {
-		CoinType coinType = null;
-		try {
-			if (updateSymbol(coinCode, symbol) <= 0) {
-				return null;
-			}
-			coinType = coinTypeRepository.findById(coinCode).orElse(null);
-		}
-		finally {
-			String s = null;
-			if (coinType != null)
-				s = JsonUtil.getJsonString(coinType, true);
-			System.out.println("--> updated coin type: " + s + "\n");
-		}
-		return coinType;
+		return (CoinType) updateSymbol(coinCode, symbol, true);
 	}
 	
 	@Transactional

@@ -16,7 +16,7 @@ public interface CoinTypeRepository extends JpaRepository<CoinType, String>{
 	Optional<CoinType> findByCode(String code);
 	
 	@Modifying
-	@Query("update CoinType ct set ct.symbol = ?2 where ct.code = ?1")
+	@Query("update CoinType ct set ct.symbol = ?2, ct.updated = now() where ct.code = ?1")
 	int updateSymbol(String coinCode, String description);
 	
 	@Modifying
