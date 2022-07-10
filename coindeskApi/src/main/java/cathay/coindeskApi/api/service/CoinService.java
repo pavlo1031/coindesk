@@ -147,7 +147,6 @@ public class CoinService {
 	}
 	
 	@Transactional
-	@Async("taskExecutor")
 	public int updateRate(String coinCode, Double rate) {
 		return updateRate(coinCode, new BigDecimal(rate));
 	}
