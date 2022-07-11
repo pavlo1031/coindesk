@@ -13,7 +13,9 @@ public class BatchUpdate<FieldType> {
 	public static <FieldType> BatchUpdate<FieldType> updateFieldValues(FieldType field, Object value) {
 		if (instance == null)
 			instance = new BatchUpdate<FieldType>();
-		return new BatchUpdate<FieldType>().set(field, value);
+		if (field != null)
+			instance.set(field, value);
+		return instance;
 	}
 	
 	private BatchUpdate() {}
