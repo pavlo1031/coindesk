@@ -12,6 +12,8 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.DynamicUpdate;
 
+import cathay.coindeskApi.util.ModelFieldSupport;
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -20,7 +22,28 @@ import lombok.experimental.Accessors;
 @Entity
 @Table(name = "coin_type")
 @DynamicUpdate
-public class CoinType implements Serializable {
+public class CoinType implements ModelFieldSupport<CoinType, CoinType.Field>, Serializable {
+	
+	public enum Field {
+		Code("code"),
+		Symbol("symbol"),
+		Rate("rate"),
+		RateFloat("rate_float"),
+		Description("description"),
+		DescriptionChinese("description_chinese"),
+		Updated("update_time");
+		
+		private String dbColumn;
+		
+		public String getDatabaseColumn() {
+			return dbColumn;
+		}
+		
+		private Field(String dbColumn) {
+			this.dbColumn = dbColumn;
+		}
+	}
+	
 	@Id
 	@PrimaryKeyJoinColumn
 	@Column(name = "code")
@@ -44,6 +67,62 @@ public class CoinType implements Serializable {
 	@Column(name = "update_datetime")
 	private Date updated;
 
+	public Object get(Field field) {
+		switch(field) {
+		case Code:
+			return code;
+		case Symbol:
+			return symbol;
+		case Rate:
+			return rate;
+		case RateFloat:
+			return rateFloat;
+		case Description:
+			return description;
+		case DescriptionChinese:
+			return descriptionChinese;
+		case Updated:
+			return updated;
+		}
+		return null;
+	}
+	
+	public CoinType set(Field field, Object val) {
+		switch(field) {
+		case Code:
+			this.code = (String) val;
+			break;
+		case Symbol:
+			this.symbol = (String) val;
+			break;
+		case Rate:
+			this.rate = (String) val;
+			break;
+		case RateFloat: {
+			BigDecimal val_ = null;
+			if (val != null) {
+				val_ = new BigDecimal(val.toString());
+			}
+			this.rateFloat = (BigDecimal) val_;
+			break;
+		}
+		case Description:
+			this.description = (String) val;
+			break;
+		case DescriptionChinese:
+			this.descriptionChinese = (String) val;
+			break;
+		case Updated:
+			this.updated = (Date) val;
+			break;
+		}
+		return this;
+	}
+	
+	public static Field[] fields() {
+		return Field.values();
+	}
+	
 	public CoinType setRateFloat(Double rateFloat) {
 		this.rateFloat = new BigDecimal(rateFloat);
 		return this;

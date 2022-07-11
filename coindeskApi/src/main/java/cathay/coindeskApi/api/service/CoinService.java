@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -14,11 +15,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import cathay.coindeskApi.api.entity.CoinType;
+import cathay.coindeskApi.api.entity.CoinType.Field;
 import cathay.coindeskApi.api.repository.CoinTypeRepository;
+import cathay.coindeskApi.util.BatchUpdate;
 import cathay.coindeskApi.util.JsonUtil;
 
 @Service
-public class CoinService {
+public class CoinService extends UpdateService<String, CoinType, Field, CoinTypeRepository> {
 
 	private static DecimalFormat CurrencyFormat;
 	
@@ -35,6 +38,11 @@ public class CoinService {
 	
 	@Autowired
 	private CoinTypeRepository coinTypeRepository;
+	
+
+	public CoinService(CoinTypeRepository repository) {
+		super(repository);
+	}
 	
 	public List<CoinType> getAllCoinTypes() {
 		List<CoinType> resultList = null;
@@ -95,7 +103,6 @@ public class CoinService {
 		return addCoinType(coinType);
 	}
 	
-	
 	public CoinType addCoinType(CoinType coinType) {
 		CoinType coinType_ = null;
 		try {
@@ -117,175 +124,9 @@ public class CoinService {
 		return coinType_;
 	}
 	
-	private Object updateSymbol(String coinCode, String symbol, boolean get) {
-		Object returnVal = null;
-		CoinType coinType = null;
-		
-		// 1. find
-		coinType = coinTypeRepository.findById(coinCode).orElse(null);
-		if (coinType == null)
-			throw new IllegalStateException("無法更新symbol欄位, 該筆資料不存在, coinCode = " + coinCode);
-
-		// 2. update
-		Throwable error = null;
-		try {
-			if (coinType.getSymbol().equals(symbol))
-				return returnVal = (get)? coinType : 0;
-
-			if (!get) { 
-				// 目前作法是: update time在JPQL中更新
-				returnVal = coinTypeRepository.updateSymbol(coinCode, symbol);
-			}
-			else {
-				coinType.setSymbol(symbol);
-				coinType.setUpdated(new Date());
-				returnVal = coinTypeRepository.save(coinType);
-			}
-			return returnVal;
-		}
-		catch (Throwable t) {
-			error = t;
-			// 記錄錯誤
-			return returnVal = coinType;
-		}
-		finally {
-			if (!get) {
-				Integer rowsAffected = (Integer) returnVal;
-				System.out.println("--> rowsAffected: " + rowsAffected + "\n");
-			} else {
-				coinType = (CoinType) returnVal;
-				String s = null;
-				if (coinType != null)
-					s = JsonUtil.getJsonString(coinType, true);
-				System.out.println("--> updated coin type: " + s + "\n");
-			}
-		}
-	}
-	
-	@Transactional
-	public Integer updateSymbol(String coinCode, String symbol) {
-		return (Integer) updateSymbol(coinCode, symbol, false);
-	}
-	
-	@Transactional
-	public CoinType updateSymbolAndGet(String coinCode, String symbol) {
-		return (CoinType) updateSymbol(coinCode, symbol, true);
-	}
-	
-	@Transactional
-	public int updateRate(String coinCode, Double rate) {
-		return updateRate(coinCode, new BigDecimal(rate));
-	}
-	
-	@Transactional
-	public Integer updateRate(String coinCode, BigDecimal rate) {
-		int rowsAffected = 0;
-		try {
-			rowsAffected = coinTypeRepository.updateRate(coinCode, CurrencyFormat.format(rate), rate);
-		} finally {
-			System.out.println("--> rowsAffected: " + rowsAffected + "\n");
-		}
-		return rowsAffected;
-	}
-	
-	@Transactional
-	public CoinType updateRateAndGet(String coinCode, Double rate) {
-		return updateRateAndGet(coinCode, new BigDecimal(rate));
-	}
-	
-	@Transactional
-	public CoinType updateRateAndGet(String coinCode, BigDecimal rate) {
-		CoinType coinType = null;
-		try {
-			if (updateRate(coinCode, rate) <= 0) {
-				return null;
-			}
-			coinType = coinTypeRepository.findById(coinCode).orElse(null);
-		}
-		finally {
-			String s = null;
-			if (coinType != null)
-				s = JsonUtil.getJsonString(coinType, true);
-			System.out.println("--> updated coin type: " + s + "\n");
-		}
-		return coinType;
-	}
-
-	
-	@Transactional
-	public int updateDescription(String coinCode, String description) {
-		int rowsAffected = 0;
-		try {
-			rowsAffected = coinTypeRepository.updateDescription(coinCode, description);
-		} finally {
-			System.out.println("--> rowsAffected: " + rowsAffected + "\n");
-		}
-		return rowsAffected;
-	}
-	
-	@Transactional
-	public int updateDescription(String coinCode, String description, String descriptionCh) {
-		int rowsAffected = 0;
-		try {
-			rowsAffected = coinTypeRepository.updateDescription(coinCode, description, descriptionCh);
-		} finally {
-			System.out.println("--> rowsAffected: " + rowsAffected + "\n");
-		}
-		return rowsAffected;
-	}
-	
-	@Transactional
-	public CoinType updateDescriptionAndGet(String coinCode, String description) {
-		CoinType coinType = null;
-		try {
-			if (updateDescription(coinCode, description) <= 0) {
-				return null;
-			}
-			coinType = coinTypeRepository.findById(coinCode).orElse(null);
-		}
-		finally {
-			String s = null;
-			if (coinType != null)
-				s = JsonUtil.getJsonString(coinType, true);
-			System.out.println("--> updated coin type: " + s + "\n");
-		}
-		return coinType;
-	}
-	
-	@Transactional
-	public CoinType updateDescriptionAndGet(String coinCode, String description, String descriptionCh) {
-		CoinType coinType = null;
-		try {
-			if (updateDescription(coinCode, description, descriptionCh) <= 0) {
-				return null;
-			}
-			coinType = coinTypeRepository.findById(coinCode).orElse(null);
-		}
-		finally {
-			String s = null;
-			if (coinType != null)
-				s = JsonUtil.getJsonString(coinType, true);
-			System.out.println("--> updated coin type: " + s + "\n");
-		}
-		return coinType;
-	}	
-	
-	@Transactional
-	public CoinType updateCoinType(CoinType coinType) {
-		CoinType coinType_ = null;
-		try {			
-			if (coinTypeRepository.existsById(coinType.getCode())) {
-				if (coinType.getUpdated() == null)
-					coinType.setUpdated(new Date());
-				coinType_ = coinTypeRepository.save(coinType);
-			}
-		}
-		finally {
-			String s = null;
-			if (coinType_ != null)
-				s = JsonUtil.getJsonString(coinType_, true);
-			System.out.println("--> updated coin type: " + s + "\n");
-		}
-		return coinTypeRepository.save(coinType);
+	protected Object update(String id, CoinType coinType, BatchUpdate<Field> batchUpdate, boolean get, Consumer<CoinType> beforeWriteAction) {
+		return super.update(id, coinType, batchUpdate, get, (coinTypeToFlush) -> {
+			coinTypeToFlush.setUpdated(new Date());
+		});
 	}
 }
