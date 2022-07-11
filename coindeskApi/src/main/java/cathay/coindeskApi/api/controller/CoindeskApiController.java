@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -57,12 +58,24 @@ public class CoindeskApiController {
 		
 		// TODO: 需要參數檢核 ??
 		
+		final CoinResponse response = new CoinResponse()
+		.setDisclaimer(
+			"This data was produced from the CoinDesk Bitcoin Price Index (USD). " +
+			"Non-USD currency data converted using hourly conversion rate from openexchangerates.org")
+		.setChartName("Bitcoin");
+				
+		CoinType coinType = null;
 		try {
-			coinService.addCoinType(coinCode, symbol, rateFloat, description, descriptionCh);
+			coinType = coinService.addCoinType(coinCode, symbol, rateFloat, description, descriptionCh);
+			response.addBpi(coinType.getCode(), new Coin(coinType.getCode(),
+					coinType.getSymbol(), coinType.getRateFloat(), coinType.getDescription(),
+					coinType.getDescriptionChinese()));
 		}
 		catch (Exception e) {
 			e.printStackTrace();
+			return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		return ResponseEntity.ok("ok");
 	}
+	
 }
