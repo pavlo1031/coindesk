@@ -10,6 +10,13 @@ public class BatchUpdate<FieldType> {
 	
 	private static BatchUpdate instance;
 	
+	
+	public static <FieldType> BatchUpdate<FieldType> updateFieldValues() {
+		if (instance == null)
+			instance = new BatchUpdate<FieldType>();
+		return instance;
+	}
+	
 	public static <FieldType> BatchUpdate<FieldType> updateFieldValues(FieldType field, Object value) {
 		if (instance == null)
 			instance = new BatchUpdate<FieldType>();
