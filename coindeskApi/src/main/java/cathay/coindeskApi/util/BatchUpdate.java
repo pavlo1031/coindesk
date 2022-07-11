@@ -25,7 +25,9 @@ public class BatchUpdate<FieldType> {
 		return instance;
 	}
 	
-	private BatchUpdate() {}
+	public BatchUpdate() {
+		instance = this;
+	}
 	
 	public BatchUpdate<FieldType> set(FieldType field, Object value) {
 		this.data.put(field, value);
