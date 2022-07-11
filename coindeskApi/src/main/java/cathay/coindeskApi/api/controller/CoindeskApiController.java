@@ -23,8 +23,8 @@ public class CoindeskApiController {
 	@Autowired
 	private CoinService coinService;
 	
-	@RequestMapping("test")
-	public ResponseEntity<?> testApi() {
+	@GetMapping(path = "list")
+	public ResponseEntity<?> list() {
 		final List<CoinType> coinTypes = coinService.getAllCoinTypes();
 		final CoinResponse response = new CoinResponse()
 		.setDisclaimer(
