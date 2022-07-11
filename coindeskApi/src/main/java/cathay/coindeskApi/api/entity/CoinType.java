@@ -7,13 +7,11 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.DynamicUpdate;
 
 import cathay.coindeskApi.util.ModelFieldSupport;
-import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -45,7 +43,6 @@ public class CoinType implements ModelFieldSupport<CoinType, CoinType.Field>, Se
 	}
 	
 	@Id
-	@PrimaryKeyJoinColumn
 	@Column(name = "code")
 	private String code;
 
