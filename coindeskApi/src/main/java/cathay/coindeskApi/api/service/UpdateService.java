@@ -1,7 +1,7 @@
 package cathay.coindeskApi.api.service;
 
 import static cathay.coindeskApi.util.BatchUpdate.updateFieldValues;
-
+import static cathay.coindeskApi.util.StringUtil.doubleQuoteString;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -84,8 +84,8 @@ public class UpdateService<IdType, EntityType extends ModelFieldSupport<EntityTy
 			entity_ = repository.findById(id).orElse(null);
 			if (entity_== null) {
 				List<String> fields = batchUpdate.keySet().stream().map((FieldType f) -> f.name()).collect(Collectors.toList());
-				throw new IllegalStateException("無法更新" + String.join(", ", fields) + "欄位, " +
-					"該筆資料不存在, coinCode = " + id);
+				throw new IllegalStateException("該筆資料不存在 (coinCode = " + doubleQuoteString(id) + "), " +
+					"無法更新" + String.join(", ", fields) + "欄位");
 			}
 		}
 		else {
