@@ -25,7 +25,7 @@ public class BatchUpdate<FieldType> {
 		return instance;
 	}
 	
-	public BatchUpdate() {
+	private BatchUpdate() {
 		instance = this;
 	}
 	

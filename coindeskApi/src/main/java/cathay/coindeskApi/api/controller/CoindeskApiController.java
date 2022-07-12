@@ -2,6 +2,7 @@ package cathay.coindeskApi.api.controller;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static cathay.coindeskApi.api.entity.CoinType.Field.*;
+import static cathay.coindeskApi.util.BatchUpdate.updateFieldValues;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -98,7 +99,7 @@ public class CoindeskApiController {
 		System.out.println("- description_chinese: " + descriptionCh);
 		System.out.println("- rate_float: " + rateFloat);
 
-		BatchUpdate<CoinType.Field> batchUpdate = new BatchUpdate<CoinType.Field>();
+		BatchUpdate<CoinType.Field> batchUpdate = updateFieldValues();
 		if (isNotBlank(symbol))
 			batchUpdate.set(Symbol, symbol);
 		if (isNotBlank(description))
