@@ -121,14 +121,9 @@ public class UpdateService<IdType, EntityType extends ModelFieldSupport<EntityTy
 		}
 		catch (Throwable t) {
 			error = t;
-			// 記錄錯誤
-			return returnVal = entity_;
+			// 正在構想如何處理錯誤?
+			// (以及是否要在此處處理)
+			throw t;
 		}
-		//finally {
-		//	String s = null;
-		//	if (returnVal != null)
-		//		s = JsonUtil.getJsonString(returnVal, true);
-		//	System.out.println("--> updated coin type: " + s + "\n");
-		//}
 	}
 }
