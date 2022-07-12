@@ -39,6 +39,19 @@ public class UpdateService<IdType, EntityType extends ModelFieldSupport<EntityTy
 		return (CoinType) update(id, (EntityType) null, updateFieldValues(field, value), true);
 	}
 	
+	/**
+	 * 單一欄位 (接收現有entity)
+	 */
+	public Integer update(IdType id, EntityType entity, FieldType field, Object value) {
+		return (Integer) update(id, entity, updateFieldValues(field, value), false);
+	}
+	
+	/**
+	 * 單一欄位 (接收現有entity)
+	 */
+	public CoinType updateAndGet(IdType id, EntityType entity, FieldType field, Object value) {
+		return (CoinType) update(id, entity, updateFieldValues(field, value), true);
+	}
 	
 	/**
 	 * 更多欄位
@@ -54,11 +67,24 @@ public class UpdateService<IdType, EntityType extends ModelFieldSupport<EntityTy
 		return (CoinType) update(id, (EntityType) null, batchUpdate, true);
 	}
 	
+	/**
+	 * 更多欄位
+	 */
+	public Integer update(IdType id, EntityType entity, BatchUpdate<FieldType> batchUpdate) {
+		return (Integer) update(id, entity, batchUpdate, false);
+	}
 	
 	/**
-	 * 更新多欄位
+	 * 多欄位 (接收現有entity)
 	 */
-	public Object update(IdType id, EntityType entity, BatchUpdate<FieldType> batchUpdate, boolean get) {
+	public CoinType updateAndGet(IdType id, EntityType entity, BatchUpdate<FieldType> batchUpdate) {
+		return (CoinType) update(id, entity, batchUpdate, true);
+	}
+	
+	/**
+	 * 多欄位 (接收現有entity)
+	 */
+	protected Object update(IdType id, EntityType entity, BatchUpdate<FieldType> batchUpdate, boolean get) {
 		return update(id, entity, batchUpdate, get, null);
 	}
 	
