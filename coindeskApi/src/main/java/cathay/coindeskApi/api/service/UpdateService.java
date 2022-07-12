@@ -8,7 +8,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.transaction.annotation.Transactional;
 
 import cathay.coindeskApi.api.entity.CoinType;
 import cathay.coindeskApi.util.BatchUpdate;
@@ -29,7 +28,6 @@ public class UpdateService<IdType, EntityType extends ModelFieldSupport<EntityTy
 	/**
 	 * 單一欄位
 	 */
-	@Transactional
 	public Integer update(IdType id, FieldType field, Object value) {
 		return (Integer) update(id, (EntityType) null, updateFieldValues(field, value), false);
 	}
@@ -37,7 +35,6 @@ public class UpdateService<IdType, EntityType extends ModelFieldSupport<EntityTy
 	/**
 	 * 單一欄位
 	 */
-	@Transactional
 	public CoinType updateAndGet(IdType id, FieldType field, Object value) {
 		return (CoinType) update(id, (EntityType) null, updateFieldValues(field, value), true);
 	}
@@ -46,7 +43,6 @@ public class UpdateService<IdType, EntityType extends ModelFieldSupport<EntityTy
 	/**
 	 * 更多欄位
 	 */
-	@Transactional
 	public Integer update(IdType id, BatchUpdate<FieldType> batchUpdate) {
 		return (Integer) update(id, (EntityType) null, batchUpdate, false);
 	}
@@ -54,7 +50,6 @@ public class UpdateService<IdType, EntityType extends ModelFieldSupport<EntityTy
 	/**
 	 * 多欄位
 	 */
-	@Transactional
 	public CoinType updateAndGet(IdType id, BatchUpdate<FieldType> batchUpdate) {
 		return (CoinType) update(id, (EntityType) null, batchUpdate, true);
 	}
@@ -63,7 +58,6 @@ public class UpdateService<IdType, EntityType extends ModelFieldSupport<EntityTy
 	/**
 	 * 更新多欄位
 	 */
-	@Transactional
 	public Object update(IdType id, EntityType entity, BatchUpdate<FieldType> batchUpdate, boolean get) {
 		return update(id, entity, batchUpdate, get, null);
 	}
@@ -71,7 +65,6 @@ public class UpdateService<IdType, EntityType extends ModelFieldSupport<EntityTy
 	/**
 	 * 更新多欄位, 並提供 "寫入資料之前" 一個可以處理資料的執行點
 	 */
-	@Transactional
 	protected Object update(IdType id, EntityType entity, BatchUpdate<FieldType> batchUpdate, boolean get,
 			Consumer<EntityType> beforeWriteAction) {
 		
