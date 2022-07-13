@@ -39,6 +39,12 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>de.bechte.junit</groupId>
+			<artifactId>junit-hierarchicalcontextrunner</artifactId>
+			<version>4.12.2</version>
+			<scope>test</scope>
+		</dependency>
 		
 		<!-- 工具 -->
 		<dependency>
