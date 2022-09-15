@@ -79,19 +79,7 @@ public class CoindeskApiController {
 	public ResponseEntity<?> add(AddCoinRequest request) {
 		
 		System.out.println("add() for 'multipart form-data' and 'x-www-form-urlencoded', POST");
-		System.out.println("- coin code: " + request.getCoinCode());
-		System.out.println("- symbol: " + request.getSymbol());
-		System.out.println("- description: " + request.getDescription());
-		System.out.println("- description_chinese: " + request.getDescriptionChinese());
-		System.out.println("- rate_float: " + request.getRateFloat());
-		
-		String coinCode = request.getCode();
-		String symbol = request.getSymbol();
-		BigDecimal rateFloat = request.getRateFloat();
-		String description = request.getDescription();
-		String descriptionCh = request.getDescriptionChinese();
-		
-		// TODO: 需要參數檢核 ??
+		System.out.println("- request: " + request);
 		
 		final CoinResponse response = new CoinResponse()
 		.setDisclaimer(
@@ -101,7 +89,8 @@ public class CoindeskApiController {
 				
 		CoinType coinType = null;
 		try {
-			coinType = coinService.addCoinType(coinCode, symbol, rateFloat, description, descriptionCh);
+			coinType = coinService.addCoinType(request.getCoinCode(), request.getSymbol(), request.getRateFloat(),
+					request.getDescription(), request.getDescriptionChinese());
 			response.addBpi(coinType.getCode(), new Coin(coinType.getCode(),
 					coinType.getSymbol(), coinType.getRateFloat(), coinType.getDescription(),
 					coinType.getDescriptionChinese()));
