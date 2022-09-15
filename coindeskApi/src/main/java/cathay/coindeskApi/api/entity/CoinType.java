@@ -11,7 +11,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.DynamicUpdate;
 
-import cathay.coindeskApi.util.ModelFieldSupport;
+import cathay.coindeskApi.util.Model;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -20,7 +20,7 @@ import lombok.experimental.Accessors;
 @Entity
 @Table(name = "coin_type")
 @DynamicUpdate
-public class CoinType implements ModelFieldSupport<CoinType, CoinType.Field>, Serializable {
+public class CoinType implements Model<CoinType, CoinType.Field>, Serializable {
 	
 	public enum Field {
 		Code("code"),
