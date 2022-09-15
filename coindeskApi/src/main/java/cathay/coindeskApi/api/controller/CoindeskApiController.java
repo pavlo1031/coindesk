@@ -52,9 +52,9 @@ public class CoindeskApiController {
 		try {
 			coinTypes = coinService.getAllCoinTypes();
 			if (coinTypes != null) {
-				for (CoinType c : coinTypes) {
+				for (CoinType c : coinTypes)
 					response.addBpi(c.getCode(), copyProperties(c, new Coin()));
-				}
+				
 			}
 			return ResponseEntity.ok(response);
 		}
