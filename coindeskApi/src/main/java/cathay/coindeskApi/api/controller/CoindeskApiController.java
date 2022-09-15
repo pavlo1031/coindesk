@@ -4,7 +4,7 @@ import static cathay.coindeskApi.api.entity.CoinType.Field.*;
 import static cathay.coindeskApi.util.BatchUpdate.updateFieldValues;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.springframework.beans.BeanUtils.copyProperties;
+import static cathay.coindeskApi.util.BeanUtils.copyProperties;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -50,8 +50,7 @@ public class CoindeskApiController {
 		
 		if (coinTypes != null) {
 			for (CoinType c : coinTypes) {
-				Coin coin = new Coin(c.getCode(), c.getSymbol(), c.getRateFloat(), c.getDescription(), c.getDescriptionChinese());
-				response.addBpi(c.getCode(), coin);
+				response.addBpi(c.getCode(), copyProperties(c, new Coin()));
 			}
 		}
 		return ResponseEntity.ok(response);
@@ -66,9 +65,7 @@ public class CoindeskApiController {
 		System.out.println("add() for JSON parameters, POST");
 		System.out.println("reuqest: " + requestJson);
 		
-		AddCoinRequest request = new AddCoinRequest();
-		copyProperties(requestJson, request);
-		
+		AddCoinRequest request = copyProperties(requestJson, new AddCoinRequest());
 		return add(request);
 	}
 	
@@ -113,9 +110,7 @@ public class CoindeskApiController {
 		System.out.println("add() for JSON parameters, POST");
 		System.out.println("request: " + requestJson);
 		
-		UpdateCoinRequest request = new UpdateCoinRequest();
-		copyProperties(requestJson, request);
-		
+		UpdateCoinRequest request = copyProperties(requestJson, new UpdateCoinRequest());
 		return update(request);
 	}
 	
