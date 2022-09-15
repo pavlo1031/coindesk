@@ -120,9 +120,11 @@ public class UpdateService<IdType, EntityType extends ModelFieldSupport<EntityTy
 				final Object val = entry.getValue();
 				// check data change
 				if (entity_.get(key).equals(val)) {
+					batchUpdate.setUpdated(key, false);
 					writeFieldsCount--;
 					continue;
 				}
+				batchUpdate.setUpdated(key, true);
 				entity_.set(entry.getKey(), entry.getValue());
 			}
 			

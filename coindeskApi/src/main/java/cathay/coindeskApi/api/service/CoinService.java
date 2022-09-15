@@ -1,6 +1,8 @@
 package cathay.coindeskApi.api.service;
 
+import static cathay.coindeskApi.util.BatchUpdate.updateFieldValues;
 import static cathay.coindeskApi.util.StringUtil.doubleQuoteString;
+import static cathay.coindeskApi.api.entity.CoinType.Field.*;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -9,10 +11,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import cathay.coindeskApi.api.entity.CoinType;
 import cathay.coindeskApi.api.entity.CoinType.Field;
@@ -124,9 +124,48 @@ public class CoinService extends UpdateService<String, CoinType, Field, CoinType
 		return coinType_;
 	}
 	
-	protected Object update(String id, CoinType coinType, BatchUpdate<Field> batchUpdate, boolean get, Consumer<CoinType> beforeWriteAction) {
-		return super.update(id, coinType, batchUpdate, get, (coinTypeToFlush) -> {
+	public Integer updateRate(String coinCode, CoinType coinType, BigDecimal rateFloat) {
+		BatchUpdate<Field> batchUpdate
+			= updateFieldValues(RateFloat, rateFloat)
+			  .set(Rate, CurrencyFormat.format(rateFloat));
+		return (Integer) update(coinCode, batchUpdate);
+	}
+	
+	public CoinType updateRateAndGet(String coinCode, CoinType coinType, BigDecimal rateFloat) {
+		BatchUpdate<Field> batchUpdate
+			= updateFieldValues(RateFloat, rateFloat)
+			  .set(Rate, CurrencyFormat.format(rateFloat));
+		return (CoinType) updateAndGet(coinCode, batchUpdate);
+	}
+	
+	public CoinType updateSymbolAndRate(String coinCode, String symbol, Double rateFloat) {
+		return updateSymbolAndRate(coinCode, symbol, new BigDecimal(rateFloat));
+	}
+	
+	public CoinType updateSymbolAndRate(String coinCode, String symbol, BigDecimal rateFloat) {
+		CoinType coinType = null;
+		try {
+			coinType = updateAndGet(coinCode, Symbol, symbol);			
+			System.out.println("--> try find again: " + getCoinType(coinCode));
+			//if (true) {
+			//	throw new RuntimeException("Error: 測試rollback");
+			//}
+			coinType = updateRateAndGet(coinCode, coinType, rateFloat);
+			return coinType;
+		}
+		catch (Exception e) {
+			throw e;
+		}
+		finally {
+			System.out.println("[before leaving]: coinType = " + coinType);
+		}
+	}
+	
+	protected Object update(String coinCode, CoinType coinType, BatchUpdate<Field> batchUpdate, boolean get, Consumer<CoinType> beforeWriteAction) {
+		Object obj = super.update(coinCode, coinType, batchUpdate, get, (coinTypeToFlush) -> {
 			coinTypeToFlush.setUpdated(new Date());
 		});
+		return obj;
+	}
 	}
 }
