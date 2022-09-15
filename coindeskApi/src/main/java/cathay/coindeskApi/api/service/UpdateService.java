@@ -53,8 +53,10 @@ public class UpdateService<IdType, EntityType extends Model<EntityType, FieldTyp
 		return (CoinType) update(id, entity, updateFieldValues(field, value), true);
 	}
 	
+	///////////////////////////////////////////////////////////////////////
+	
 	/**
-	 * 更多欄位
+	 * 多欄位
 	 */
 	public Integer update(IdType id, BatchUpdate<FieldType> batchUpdate) {
 		return (Integer) update(id, (EntityType) null, batchUpdate, false);
@@ -68,7 +70,7 @@ public class UpdateService<IdType, EntityType extends Model<EntityType, FieldTyp
 	}
 	
 	/**
-	 * 更多欄位
+	 * 多欄位 (接收現有entity)
 	 */
 	public Integer update(IdType id, EntityType entity, BatchUpdate<FieldType> batchUpdate) {
 		return (Integer) update(id, entity, batchUpdate, false);
