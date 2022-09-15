@@ -2,6 +2,7 @@ package cathay.coindeskApi.api.controller;
 
 import static cathay.coindeskApi.api.entity.CoinType.Field.*;
 import static cathay.coindeskApi.util.BatchUpdate.updateFieldValues;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.beans.BeanUtils.copyProperties;
 
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -153,5 +155,33 @@ public class CoindeskApiController {
 			batchUpdate.reset();
 		}
 		return ResponseEntity.ok(response);
+	}
+	
+	@DeleteMapping(path = "delete")
+	public ResponseEntity<?> delete(@RequestParam(name = "code") String coinCode) {
+		
+		System.out.println("delete(), DELETE");
+		
+		final CoinResponse response = new CoinResponse()
+		.setDisclaimer(
+			"This data was produced from the CoinDesk Bitcoin Price Index (USD). " +
+			"Non-USD currency data converted using hourly conversion rate from openexchangerates.org")
+		.setChartName("Bitcoin");
+		
+		if (isBlank(coinCode)) {
+			throw new IllegalArgumentException("Coin code not present. Please give a non-empty value;");
+		}
+		
+		CoinType coinType = null;
+		try {
+			coinType = coinService.delete(coinCode);
+			return ResponseEntity.ok(response);	
+		}
+		//catch (Exception e) {
+		//    // 刪除失敗	
+		//}
+		finally {
+			
+		}
 	}
 }

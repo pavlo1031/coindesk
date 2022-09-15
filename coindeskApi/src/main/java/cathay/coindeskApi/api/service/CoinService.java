@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -167,5 +168,13 @@ public class CoinService extends UpdateService<String, CoinType, Field, CoinType
 		});
 		return obj;
 	}
+	
+	public CoinType delete(String coinCode) {
+		if (!coinTypeRepository.existsById(coinCode))
+			throw new IllegalStateException("The coin type does not exist: " + doubleQuoteString(coinCode));
+		
+		Optional<CoinType> coinTypeOptional = coinTypeRepository.findById(coinCode);
+		coinTypeRepository.deleteById(coinCode);
+		return coinTypeOptional.get();
 	}
 }
