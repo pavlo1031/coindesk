@@ -160,7 +160,9 @@ public class CoindeskApiController {
 	@DeleteMapping(path = "delete")
 	public ResponseEntity<?> delete(@RequestParam(name = "code") String coinCode) {
 		
+
 		System.out.println("delete(), DELETE");
+		System.out.println("- coin code: " + coinCode);
 		
 		final CoinResponse response = new CoinResponse()
 		.setDisclaimer(
@@ -172,14 +174,13 @@ public class CoindeskApiController {
 			throw new IllegalArgumentException("Coin code not present. Please give a non-empty value;");
 		}
 		
-		CoinType coinType = null;
 		try {
-			coinType = coinService.delete(coinCode);
+			coinService.delete(coinCode);
 			return ResponseEntity.ok(response);	
 		}
-		//catch (Exception e) {
-		//    // 刪除失敗	
-		//}
+		catch (Throwable t) {
+			return new ResponseEntity<String>(t.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 		finally {
 			
 		}
