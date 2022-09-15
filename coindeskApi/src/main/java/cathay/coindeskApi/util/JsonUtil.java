@@ -65,8 +65,9 @@ public class JsonUtil {
 	
 	public static String getJsonString(Object o, boolean prettyOutput) {
 		Object obj = getJson(o);
-		if (JsonNode.class != obj.getClass() && ObjectNode.class != obj.getClass())
-			return String.valueOf(obj);
+		
+		//if (JsonNode.class != obj.getClass() && ObjectNode.class != obj.getClass())
+		//	return String.valueOf(obj);
 		
 		String jsonString = null;
 		try {
