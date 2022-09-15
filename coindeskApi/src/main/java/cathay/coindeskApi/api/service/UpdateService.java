@@ -11,12 +11,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import cathay.coindeskApi.api.entity.CoinType;
 import cathay.coindeskApi.util.BatchUpdate;
-import cathay.coindeskApi.util.ModelFieldSupport;
+import cathay.coindeskApi.util.Model;
 
 /**
  * 未來未提供 "多種" entity type的資料更新功能
  */
-public class UpdateService<IdType, EntityType extends ModelFieldSupport<EntityType, FieldType>,
+public class UpdateService<IdType, EntityType extends Model<EntityType, FieldType>,
 	FieldType extends Enum<FieldType>, RepositoryType extends JpaRepository<EntityType, IdType>> {
 
 	private RepositoryType repository;
