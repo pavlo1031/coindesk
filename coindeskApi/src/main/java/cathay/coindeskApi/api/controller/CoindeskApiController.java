@@ -41,19 +41,26 @@ public class CoindeskApiController {
 	
 	@GetMapping(path = "list")
 	public ResponseEntity<?> list() {
-		final List<CoinType> coinTypes = coinService.getAllCoinTypes();
+		System.out.println("list(), GET");
 		final CoinResponse response = new CoinResponse()
 		.setDisclaimer(
 			"This data was produced from the CoinDesk Bitcoin Price Index (USD). " +
 			"Non-USD currency data converted using hourly conversion rate from openexchangerates.org")
 		.setChartName("Bitcoin");
 		
-		if (coinTypes != null) {
-			for (CoinType c : coinTypes) {
-				response.addBpi(c.getCode(), copyProperties(c, new Coin()));
+		List<CoinType> coinTypes = null;
+		try {
+			coinTypes = coinService.getAllCoinTypes();
+			if (coinTypes != null) {
+				for (CoinType c : coinTypes) {
+					response.addBpi(c.getCode(), copyProperties(c, new Coin()));
+				}
 			}
+			return ResponseEntity.ok(response);
 		}
-		return ResponseEntity.ok(response);
+		catch (Throwable t) {
+			return new ResponseEntity<String>(t.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	/**
