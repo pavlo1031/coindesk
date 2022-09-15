@@ -102,7 +102,6 @@ public class CoindeskApiController {
 					coinType.getDescriptionChinese()));
 		}
 		catch (Exception e) {
-			e.printStackTrace();
 			return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		return ResponseEntity.ok("ok");
@@ -150,7 +149,6 @@ public class CoindeskApiController {
 				coinType.getDescriptionChinese()));
 		}
 		catch (Exception e) {
-			e.printStackTrace();
 			return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		finally {
@@ -182,9 +180,6 @@ public class CoindeskApiController {
 		}
 		catch (Throwable t) {
 			return new ResponseEntity<String>(t.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		finally {
-			
 		}
 	}
 }
