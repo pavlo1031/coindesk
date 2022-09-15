@@ -26,6 +26,8 @@ import cathay.coindeskApi.api.vo.AddCoinRequest;
 import cathay.coindeskApi.api.vo.AddCoinRequestJson;
 import cathay.coindeskApi.api.vo.Coin;
 import cathay.coindeskApi.api.vo.CoinResponse;
+import cathay.coindeskApi.api.vo.UpdateCoinRequest;
+import cathay.coindeskApi.api.vo.UpdateCoinRequestJson;
 import cathay.coindeskApi.util.BatchUpdate;
 
 @RestController
@@ -111,21 +113,26 @@ public class CoindeskApiController {
 		return ResponseEntity.ok("ok");
 	}
 	
+	/**
+	 * 參數形式
+	 * application/json
+	 */
+	@PostMapping(path = "update", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_JSON_UTF8_VALUE})
+	public ResponseEntity<?> update(@RequestBody UpdateCoinRequestJson requestJson) {
+		System.out.println("add() for JSON parameters, POST");
+		System.out.println("request: " + requestJson);
+		
+		UpdateCoinRequest request = new UpdateCoinRequest();
+		copyProperties(requestJson, request);
+		
+		return update(request);
+	}
+	
 	@PutMapping(path = "update")
-	public ResponseEntity<?> update(
-			@RequestParam(name = "code") String coinCode,
-			@RequestParam(name = "symbol", required = false) String symbol,
-			@RequestParam(name = "description", required = false) String description,
-			@RequestParam(name = "description_chinese", required = false) String descriptionCh,
-			@RequestParam(name = "rate_float", required = false) BigDecimal rateFloat) {
+	public ResponseEntity<?> update(UpdateCoinRequest request) {
 		
 		System.out.println("update(), PUT");
-		System.out.println("- code: " + coinCode);
-		System.out.println("- symbol: " + symbol);
-		System.out.println("- description: " + description);
-		System.out.println("- description_chinese: " + descriptionCh);
-		System.out.println("- rate_float: " + rateFloat);
-
+		System.out.println("- request: " + request);
 		BatchUpdate<CoinType.Field> batchUpdate = updateFieldValues();
 		if (isNotBlank(symbol))
 			batchUpdate.set(Symbol, symbol);
