@@ -176,18 +176,17 @@ public class CoinService extends UpdateService<String, CoinType, Field, CoinType
 	}
 	
 	public CoinType deleteAndGet(String coinCode) {
-		if (!coinTypeRepository.existsById(coinCode))
-			throw new IllegalStateException("The coin type does not exist: " + doubleQuoteString(coinCode));
-		
 		Optional<CoinType> coinTypeOptional = null;
 		try {
 			coinTypeOptional = coinTypeRepository.findById(coinCode);
+			if (!coinTypeOptional.isPresent())
+				throw new IllegalStateException("The coin type does not exist: " + doubleQuoteString(coinCode));
+			
 			coinTypeRepository.deleteById(coinCode);
 			return coinTypeOptional.get();
 		}
 		catch (Throwable t) {
-			// 出了其他錯誤, 該怎麼辦??
-			return null;
+			throw t;
 		}
 	}
 }
