@@ -170,9 +170,14 @@ public class CoinService extends UpdateService<String, CoinType, Field, CoinType
 	}
 	
 	public void delete(String coinCode) {
-		if (!coinTypeRepository.existsById(coinCode))
-			throw new IllegalStateException("The coin type does not exist: " + doubleQuoteString(coinCode));
-		coinTypeRepository.deleteById(coinCode);
+		try {
+			if (!coinTypeRepository.existsById(coinCode))
+				throw new IllegalStateException("The coin type does not exist: " + doubleQuoteString(coinCode));
+			coinTypeRepository.deleteById(coinCode);
+		}
+		catch (Throwable t) {
+			throw t;
+		}
 	}
 	
 	public CoinType deleteAndGet(String coinCode) {
