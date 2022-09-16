@@ -42,7 +42,7 @@ public class CoinRequest {
 		return this;
 	}
 	
-	public BigDecimal setRate_float() {
+	public BigDecimal getRate_float() {
 		return this.rateFloat;
 	}
 }
