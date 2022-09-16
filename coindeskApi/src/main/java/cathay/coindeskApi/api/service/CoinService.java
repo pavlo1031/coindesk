@@ -122,43 +122,6 @@ public class CoinService extends UpdateService<String, CoinType, Field, CoinType
 		return coinType_;
 	}
 	
-	public Integer updateRate(String coinCode, CoinType coinType, BigDecimal rateFloat) {
-		BatchUpdate<Field> batchUpdate
-			= updateFieldValues(RateFloat, rateFloat)
-			  .set(Rate, CurrencyFormat.format(rateFloat));
-		return (Integer) update(coinCode, batchUpdate);
-	}
-	
-	public CoinType updateRateAndGet(String coinCode, CoinType coinType, BigDecimal rateFloat) {
-		BatchUpdate<Field> batchUpdate
-			= updateFieldValues(RateFloat, rateFloat)
-			  .set(Rate, CurrencyFormat.format(rateFloat));
-		return (CoinType) updateAndGet(coinCode, batchUpdate);
-	}
-	
-	public CoinType updateSymbolAndRate(String coinCode, String symbol, Double rateFloat) {
-		return updateSymbolAndRate(coinCode, symbol, new BigDecimal(rateFloat));
-	}
-	
-	public CoinType updateSymbolAndRate(String coinCode, String symbol, BigDecimal rateFloat) {
-		CoinType coinType = null;
-		try {
-			coinType = updateAndGet(coinCode, Symbol, symbol);			
-			System.out.println("--> try find again: " + getCoinType(coinCode));
-			//if (true) {
-			//	throw new RuntimeException("Error: 測試rollback");
-			//}
-			coinType = updateRateAndGet(coinCode, coinType, rateFloat);
-			return coinType;
-		}
-		catch (Exception e) {
-			throw e;
-		}
-		finally {
-			System.out.println("[before leaving]: coinType = " + coinType);
-		}
-	}
-	
 	protected Object update(String coinCode, CoinType coinType, BatchUpdate<Field> batchUpdate, boolean get, Consumer<CoinType> beforeWriteAction) {
 		Object obj = super.update(coinCode, coinType, batchUpdate, get, (coinTypeToFlush) -> {
 			coinTypeToFlush.setUpdated(new Date());
