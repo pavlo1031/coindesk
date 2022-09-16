@@ -54,7 +54,6 @@ public class CoinService extends UpdateService<String, CoinType, Field, CoinType
 			String s = null;
 			if (resultList != null)
 				s = JsonUtil.getJsonString(resultList, true);
-			System.out.println("--> all coin types: " + s);
 		}
 		return coinTypeRepository.findAll();
 	}
@@ -68,7 +67,6 @@ public class CoinService extends UpdateService<String, CoinType, Field, CoinType
 			String s = null;
 			if (coinType != null)
 				s = JsonUtil.getJsonString(coinType, true);
-			System.out.println("--> get coin type: " + s);
 		}
 		return coinType;
 	}
@@ -120,7 +118,6 @@ public class CoinService extends UpdateService<String, CoinType, Field, CoinType
 			String s = null;
 			if (coinType_ != null)
 				s = JsonUtil.getJsonString(coinType_, true);
-			System.out.println("--> added coin type: " + s);
 		}
 		return coinType_;
 	}
