@@ -93,8 +93,8 @@ public class CoindeskApiController {
 					request.getDescription(), request.getDescriptionChinese());
 			return ResponseEntity.ok(coinType);
 		}
-		catch (Exception e) {
-			return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		catch (Throwable t) {
+			return new ResponseEntity<String>(t.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
@@ -126,19 +126,14 @@ public class CoindeskApiController {
 		if (rateFloat != null)
 			batchUpdate.set(RateFloat, rateFloat);
 		
-		final CoinResponse response = new CoinResponse()
-		.setDisclaimer(
-			"This data was produced from the CoinDesk Bitcoin Price Index (USD). " +
-			"Non-USD currency data converted using hourly conversion rate from openexchangerates.org")
-		.setChartName("Bitcoin");
 		
 		CoinType coinType = null;
 		try {
 			coinType = coinService.updateAndGet(coinCode, batchUpdate);
 			return ResponseEntity.ok(coinType);
 		}
-		catch (Exception e) {
-			return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		catch (Throwable t) {
+			return new ResponseEntity<String>(t.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		finally {
 			batchUpdate.reset();
