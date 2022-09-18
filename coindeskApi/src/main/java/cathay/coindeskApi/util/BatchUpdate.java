@@ -29,6 +29,13 @@ public class BatchUpdate<FieldType> {
 		instance = this;
 	}
 	
+	private BatchUpdate(FieldType field, Object value) {
+		if (field == null)
+			throw new IllegalArgumentException("the argument 'field' cannot be null");
+		this.data.put(field, value);
+		instance = this;
+	}
+	
 	public BatchUpdate<FieldType> set(FieldType field, Object value) {
 		this.data.put(field, value);
 		return this;
