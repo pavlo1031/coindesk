@@ -2,6 +2,8 @@ package cathay.coindeskApi.api.vo;
 
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
@@ -10,68 +12,88 @@ import lombok.Setter;
 @Setter(AccessLevel.NONE)
 public class CoinRequest {
 	
-	private String coinCode;
+	private String code;
 	
 	private String symbol;
 	
 	private String description;
 	
-	private String descriptionChinese;
+	private String description_chinese;
 	
 	private String rate;
 	
-	private BigDecimal rateFloat;
+	private BigDecimal rate_float;
 	
 	public <T extends CoinRequest> T setCoinCode(String coinCode) {
-		this.coinCode = coinCode;
+		this.code = coinCode;
 		return (T) this;
 	}
 	
 	public <T extends CoinRequest> T setCode(String coinCode) {
-		this.coinCode = coinCode;
+		this.code = coinCode;
 		return (T) this;
 	}
 	
 	public String getCode() {
-		return this.coinCode;
+		return this.code;
 	}
-	
+
+	@JsonIgnore
+	public String getCoinCode() {
+		return this.code;
+	}
+
 	public <T extends CoinRequest> T setSymbol(String symbol) {
 		this.symbol = symbol;
 		return (T) this;
 	}
 	
+	public <T extends CoinRequest> T setDescription(String description) {
+		this.description = description;
+		return (T) this;
+	}
+	
 	public <T extends CoinRequest> T setDescriptionChinese(String descriptionCh) {
-		this.descriptionChinese = descriptionCh;
+		this.description_chinese = descriptionCh;
 		return (T) this;
 	}
 	
 	public <T extends CoinRequest> T setDescription_chinese(String descriptionCh) {
-		this.descriptionChinese = descriptionCh;
+		this.description_chinese = descriptionCh;
 		return (T) this;
 	}
 	
 	public String getDescription_chinese() {
-		return this.descriptionChinese;
+		return this.description_chinese;
+	}
+	
+	@JsonIgnore
+	public String getDescriptionChinese() {
+		return this.description;
 	}
 	
 	public <T extends CoinRequest> T setRate_float(BigDecimal rateFloat) {
-		this.rateFloat = rateFloat;
+		this.rate_float = rateFloat;
 		return (T) this;
 	}
 	
 	public <T extends CoinRequest> T setRateFloat(Double rateFloat) {
-		this.rateFloat = new BigDecimal(rateFloat);
+		this.rate_float = new BigDecimal(rateFloat);
 		return (T) this;
 	}
 
 	public <T extends CoinRequest> T setRateFloat(Float rateFloat) {
-		this.rateFloat = new BigDecimal(rateFloat);
+		this.rate_float = new BigDecimal(rateFloat);
 		return (T) this;
 	}
 	
 	public BigDecimal getRate_float() {
-		return this.rateFloat;
+		return this.rate_float;
+	}
+
+	@JsonIgnore
+	public BigDecimal getRateFloat() {
+		return rate_float;
 	}
 	
 	public <T extends CoinRequest> T setRate(String rate) {
