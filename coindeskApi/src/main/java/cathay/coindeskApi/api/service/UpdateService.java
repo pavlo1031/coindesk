@@ -105,7 +105,7 @@ public class UpdateService<IdType, EntityType extends Model<EntityType, FieldTyp
 			entity_ = repository.findById(id).orElse(null);
 			if (entity_== null) {
 				List<String> fields = batchUpdate.keySet().stream().map((FieldType f) -> f.name()).collect(Collectors.toList());
-				throw new IllegalStateException("該筆資料不存在 (coinCode = " + doubleQuoteString(id) + "), " +
+				throw new IllegalStateException("該幣別不存在 (coinCode = " + doubleQuoteString(id) + "), " +
 					"無法更新" + String.join(", ", fields) + "欄位");
 			}
 		}
