@@ -57,4 +57,9 @@ public class BatchUpdate<FieldType> {
 		this.data.clear();
 		return this;
 	}
+	
+	@Override
+	public String toString() {
+		return data.toString();
+	}
 }
