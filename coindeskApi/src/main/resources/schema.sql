@@ -7,7 +7,7 @@ CREATE TABLE coin_type (
 	symbol char(15),
 	rate varchar(20),
 	description varchar(100),
-	description_chinese varchar(10),
+	description_chinese varchar(100),
 	rate_float decimal(10,4),
 	update_time datetime default now()
 );
