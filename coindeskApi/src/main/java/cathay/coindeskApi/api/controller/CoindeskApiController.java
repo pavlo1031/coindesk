@@ -116,20 +116,51 @@ public class CoindeskApiController {
 		
 		System.out.println("update(), PUT");
 		System.out.println("- request: " + request);
+
 		BatchUpdate<CoinType.Field> batchUpdate = updateFieldValues();
-		if (isNotBlank(symbol))
-			batchUpdate.set(Symbol, symbol);
-		if (isNotBlank(description))
-			batchUpdate.set(Description, description);
-		if (isNotBlank(descriptionCh))
-			batchUpdate.set(DescriptionChinese, descriptionCh);
-		if (rateFloat != null)
-			batchUpdate.set(RateFloat, rateFloat);
 		
+		String code = request.getCode();
+		String symbol = request.getSymbol();
+		String rate = request.getRate();
+		BigDecimal rateFloat = request.getRateFloat();
+		String description = request.getDescription();
+		String descriptionCh = request.getDescriptionChinese();
 		
 		CoinType coinType = null;
-		try {
-			coinType = coinService.updateAndGet(coinCode, batchUpdate);
+		try {			
+			// coin code 值一定要有
+			if (isBlank(request.getCoinCode())) {
+				throw new IllegalArgumentException("參數 'code'(幣別) 未提供");
+			}
+			
+			if (isNotBlank(symbol))
+				batchUpdate.set(Symbol, symbol);
+			
+			if (isNotBlank(rate) && rateFloat != null) {
+				if (!rate.equals(rateFloat.toString())) {
+					throw new IllegalArgumentException("參數 'rate' 與 'rate_float' 值不相等. " +
+						"(同時提供2參數rate, rate_float時, 值必須等): " + "rate = " + rate + ", " + "rate_float = " + rateFloat);
+				}
+			}
+			
+			if (isNotBlank(rate) && rateFloat == null)
+				rateFloat = new BigDecimal(rate);
+			if (isBlank(rate) && rateFloat != null)
+				rate = rateFloat.toString();
+			
+			if (rateFloat != null)
+				batchUpdate.set(RateFloat, rateFloat);
+			if (isNotBlank(rate))
+				batchUpdate.set(Rate, rate);
+			
+		
+			if (isNotBlank(description))
+				batchUpdate.set(Description, description);
+			
+			if (isNotBlank(descriptionCh))
+				batchUpdate.set(DescriptionChinese, descriptionCh);
+	
+			coinType = coinService.updateAndGet(code, batchUpdate);
 			return ResponseEntity.ok(coinType);
 		}
 		catch (Throwable t) {
