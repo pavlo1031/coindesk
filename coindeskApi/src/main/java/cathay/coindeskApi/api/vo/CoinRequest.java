@@ -69,7 +69,7 @@ public class CoinRequest {
 	
 	@JsonIgnore
 	public String getDescriptionChinese() {
-		return this.description;
+		return this.description_chinese;
 	}
 	
 	public <T extends CoinRequest> T setRate_float(BigDecimal rateFloat) {
