@@ -87,24 +87,15 @@ public class CoindeskApiController {
 		System.out.println("add() for 'multipart form-data' and 'x-www-form-urlencoded', POST");
 		System.out.println("- request: " + request);
 		
-		final CoinResponse response = new CoinResponse()
-		.setDisclaimer(
-			"This data was produced from the CoinDesk Bitcoin Price Index (USD). " +
-			"Non-USD currency data converted using hourly conversion rate from openexchangerates.org")
-		.setChartName("Bitcoin");
-				
 		CoinType coinType = null;
 		try {
 			coinType = coinService.addCoinType(request.getCoinCode(), request.getSymbol(), request.getRateFloat(),
 					request.getDescription(), request.getDescriptionChinese());
-			response.addBpi(coinType.getCode(), new Coin(coinType.getCode(),
-					coinType.getSymbol(), coinType.getRateFloat(), coinType.getDescription(),
-					coinType.getDescriptionChinese()));
+			return ResponseEntity.ok(coinType);
 		}
 		catch (Exception e) {
 			return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		return ResponseEntity.ok("ok");
 	}
 	
 	/**
@@ -144,9 +135,7 @@ public class CoindeskApiController {
 		CoinType coinType = null;
 		try {
 			coinType = coinService.updateAndGet(coinCode, batchUpdate);
-			response.addBpi(coinType.getCode(), new Coin(coinType.getCode(),
-				coinType.getSymbol(), coinType.getRateFloat(), coinType.getDescription(),
-				coinType.getDescriptionChinese()));
+			return ResponseEntity.ok(coinType);
 		}
 		catch (Exception e) {
 			return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -154,29 +143,22 @@ public class CoindeskApiController {
 		finally {
 			batchUpdate.reset();
 		}
-		return ResponseEntity.ok(response);
 	}
 	
 	@DeleteMapping(path = "delete")
 	public ResponseEntity<?> delete(@RequestParam(name = "code") String coinCode) {
 		
-
 		System.out.println("delete(), DELETE");
 		System.out.println("- coin code: " + coinCode);
-		
-		final CoinResponse response = new CoinResponse()
-		.setDisclaimer(
-			"This data was produced from the CoinDesk Bitcoin Price Index (USD). " +
-			"Non-USD currency data converted using hourly conversion rate from openexchangerates.org")
-		.setChartName("Bitcoin");
 		
 		if (isBlank(coinCode)) {
 			throw new IllegalArgumentException("Coin code not present. Please give a non-empty value;");
 		}
 		
+		CoinType coinType = null;
 		try {
-			coinService.delete(coinCode);
-			return ResponseEntity.ok(response);	
+			coinType = coinService.deleteAndGet(coinCode);
+			return ResponseEntity.ok(coinType);	
 		}
 		catch (Throwable t) {
 			return new ResponseEntity<String>(t.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
