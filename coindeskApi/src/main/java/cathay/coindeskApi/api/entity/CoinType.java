@@ -61,7 +61,7 @@ public class CoinType implements Model<CoinType, CoinType.Field>, Serializable {
 	@Column(name = "rate_float")
 	private BigDecimal rateFloat;
 
-	@Column(name = "update_datetime")
+	@Column(name = "update_time")
 	private Date updated;
 
 	public Object get(Field field) {

@@ -9,5 +9,5 @@ CREATE TABLE coin_type (
 	description varchar(100),
 	description_chinese varchar(10),
 	rate_float decimal(10,4),
-	update_datetime datetime default now()
+	update_time datetime default now()
 );
