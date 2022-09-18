@@ -122,6 +122,7 @@ public class CoinService extends UpdateService<String, CoinType, Field, CoinType
 		return coinType_;
 	}
 	
+	@Override
 	protected Object update(String coinCode, CoinType coinType, BatchUpdate<Field> batchUpdate, boolean get, Consumer<CoinType> beforeWriteAction) {
 		Object obj = super.update(coinCode, coinType, batchUpdate, get, (coinTypeToFlush) -> {
 			coinTypeToFlush.setUpdated(new Date());
