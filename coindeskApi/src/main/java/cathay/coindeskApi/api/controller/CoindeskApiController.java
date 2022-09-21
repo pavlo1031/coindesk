@@ -65,7 +65,7 @@ public class CoindeskApiController {
 	
 	/**
 	 * 參數形式
-	 * application/json
+	 * • application/json
 	 */
 	@PostMapping(path = "add", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_JSON_UTF8_VALUE})
 	public ResponseEntity<?> add(@RequestBody AddCoinRequestJson requestJson) {
@@ -73,20 +73,27 @@ public class CoindeskApiController {
 		System.out.println("reuqest: " + requestJson);
 		
 		AddCoinRequest request = copyProperties(requestJson, new AddCoinRequest());
-		return add(request);
+		return add_internal_impl(request);
 	}
-	
+
 	/**
 	 * 參數形式
-	 * multipart form data
-	 * x-www-form-urlencoded
+	 * • multipart form data
+	 * • x-www-form-urlencoded
 	 */
 	@PostMapping(path = "add")
 	public ResponseEntity<?> add(AddCoinRequest request) {
-		
 		System.out.println("add() for 'multipart form-data' and 'x-www-form-urlencoded', POST");
 		System.out.println("- request: " + request);
-		
+		return add_internal_impl(request);
+	}
+	
+	/*
+	 * internal implementation
+	 */
+	private ResponseEntity<?> add_internal_impl(AddCoinRequest request) {		
+		System.out.println("add() for 'multipart form-data' and 'x-www-form-urlencoded', POST");
+		System.out.println("- request: " + request);		
 		CoinType coinType = null;
 		try {
 			coinType = coinService.addCoinType(request.getCoinCode(), request.getSymbol(), request.getRateFloat(),
@@ -104,21 +111,26 @@ public class CoindeskApiController {
 	 */
 	@PostMapping(path = "update", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_JSON_UTF8_VALUE})
 	public ResponseEntity<?> update(@RequestBody UpdateCoinRequestJson requestJson) {
-		System.out.println("add() for JSON parameters, POST");
-		System.out.println("request: " + requestJson);
-		
+		System.out.println("update() for JSON parameters, POST");
+		System.out.println("request: " + requestJson);		
 		UpdateCoinRequest request = copyProperties(requestJson, new UpdateCoinRequest());
-		return update(request);
+		return update_internal_impl(request);
 	}
-	
+
 	@PutMapping(path = "update")
-	public ResponseEntity<?> update(UpdateCoinRequest request) {
-		
+	public ResponseEntity<?> update(UpdateCoinRequest request) {		
 		System.out.println("update(), PUT");
 		System.out.println("- request: " + request);
+		return update_internal_impl(request);
+	}
 
+	/*
+	 * internal implementation
+	 */
+	private ResponseEntity<?> update_internal_impl(UpdateCoinRequest request) {
+		// Prepare batchUpdate 
 		BatchUpdate<CoinType.Field> batchUpdate = updateFieldValues();
-		
+		// fetch parameter values
 		String code = request.getCode();
 		String symbol = request.getSymbol();
 		String rate = request.getRate();
@@ -139,7 +151,8 @@ public class CoindeskApiController {
 			if (isNotBlank(rate) && rateFloat != null) {
 				if (!rate.equals(rateFloat.toString())) {
 					throw new IllegalArgumentException("參數 'rate' 與 'rate_float' 值不相等. " +
-						"(同時提供2參數rate, rate_float時, 值必須等): " + "rate = " + rate + ", " + "rate_float = " + rateFloat);
+						"(同時提供2參數rate, rate_float時, 二參數值必須相等): " +
+						"rate = " + rate + ", " + "rate_float = " + rateFloat);
 				}
 			}
 			
