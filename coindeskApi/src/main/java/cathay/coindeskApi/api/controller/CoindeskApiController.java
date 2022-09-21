@@ -185,11 +185,11 @@ public class CoindeskApiController {
 	}
 	
 	@DeleteMapping(path = "delete")
-	public ResponseEntity<?> delete(@RequestParam(name = "code") String coinCode) {
-		
+	public ResponseEntity<?> delete(@RequestParam(name = "code") String coinCode) {		
 		System.out.println("delete(), DELETE");
 		System.out.println("- coin code: " + coinCode);
 		
+		// validation 
 		if (isBlank(coinCode)) {
 			throw new IllegalArgumentException("Coin code not present. Please give a non-empty value;");
 		}
