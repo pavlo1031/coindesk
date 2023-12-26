@@ -1,4 +1,6 @@
-package cathay.coindeskApi;
+package cathay.coindeskApi.api;
+
+import java.util.function.Function;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
