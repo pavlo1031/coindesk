@@ -17,10 +17,11 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import cathay.coindeskApi.api.Application;
 import cathay.coindeskApi.api.vo.AddCoinRequest;
 import cathay.coindeskApi.api.vo.UpdateCoinRequest;
 
-@SpringBootTest
+@SpringBootTest(classes = {Application.class})
 @ExtendWith(SpringExtension.class)
 @AutoConfigureMockMvc
 public class CoinApiTest {
