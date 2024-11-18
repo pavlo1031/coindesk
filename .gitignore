@@ -1,0 +1,7 @@
+﻿.metadata
+coindeskApi/target
+commons/target
+*.settings
+*.classpath
+*.factorypath
+*.project
