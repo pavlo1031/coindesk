@@ -1,5 +1,7 @@
 package cathay.coindeskApi.api.controller;
 
+import static cathay.coindeskApi.commons.util.CollectionUtils.toList;
+import static cathay.coindeskApi.commons.util.JsonUtils.getJsonStringPrettyFormat;
 
 import java.util.List;
 
@@ -16,9 +18,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cathay.coindeskApi.api.service.CoinService;
+import cathay.coindeskApi.api.vo.Coin;
 import cathay.coindeskApi.api.vo.CoinTypeRequest;
 import cathay.coindeskApi.api.vo.CoinTypeResponse;
-import cathay.coindeskApi.api.vo.Coin;
+import cathay.coindeskApi.api.vo.UpdateCoinTypeRequest;
+import cathay.coindeskApi.api.vo.UpdateCoinTypeResponse;
 
 @RestController
 @RequestMapping("/api/v1.0.0/coin")
@@ -54,17 +58,29 @@ public class CoindeskApiController {
 		return ResponseEntity.ok(response);
 	}
 
-	
 	/**
 	 * update: 更新幣種資料
-	 * @param request 接收JSON資料
+	 * 
+	 * @param coinTypes 欲更新之幣別的資料集合
+	 * @param returningUpdated 是否要傳回成功新增的幣別; 先預設為true(演示之用); 若是實務上, 會預設為false
 	 */
 	@PutMapping(path = "update", consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<?> update(@RequestBody CoinTypeRequest request) {
+	public ResponseEntity<?> update(@RequestBody UpdateCoinTypeRequest request) {
 		System.out.println("update() PUT, 接受JSON資料");
-		CoinTypeResponse response = new CoinTypeResponse()
-			.setData(request)
-			.setMsg("後端建構中, 已收到JSON資料");
+		System.out.println("request: " + getJsonStringPrettyFormat(request));
+		System.out.println("- returns updated? " + request.isReturningUpdated());
+		
+		List<Coin> updated = toList(coinService.update(request.getCoins(), request.isReturningUpdated()), Coin.class);
+		
+		UpdateCoinTypeResponse response = new UpdateCoinTypeResponse();
+		if (request.isReturningUpdated()) {
+			response.addBpi(updated);
+		}
+		else {
+			// 保證完全不會出現updated藍位
+			response.setUpdated(null);
+			response.setRowsAffected(updated.size());
+		}
 		return ResponseEntity.ok(response);
 	}
 	
