@@ -1,5 +1,7 @@
 package cathay.coindeskApi.api.controller;
 
+import static cathay.coindeskApi.commons.util.CollectionUtils.toList;
+import static cathay.coindeskApi.commons.util.CollectionUtils.toMap;
 
 import java.util.List;
 
@@ -19,6 +21,8 @@ import cathay.coindeskApi.api.service.CoinService;
 import cathay.coindeskApi.api.vo.CoinTypeRequest;
 import cathay.coindeskApi.api.vo.CoinTypeResponse;
 import cathay.coindeskApi.api.vo.Coin;
+import cathay.coindeskApi.api.vo.ListCoinTypeRequest;
+import cathay.coindeskApi.api.vo.ListCoinTypeResponse;
 
 @RestController
 @RequestMapping("/api/v1.0.0/coin")
@@ -33,12 +37,38 @@ public class CoindeskApiController {
 	/**
 	 * list 取得所有幣別
 	 */
-	@GetMapping(path = "list", produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<?> list() {
-		System.out.println("list(), GET");
-		CoinTypeResponse response = new CoinTypeResponse();
-		response.setMsg("後端建構中...");
-		return ResponseEntity.ok(response);
+	@GetMapping(path = "list", consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
+	public ResponseEntity<?> list(@RequestBody(required = false) ListCoinTypeRequest request) {
+		System.out.println("list(" + ((request != null)? "ListCoinTypeRequest":"") + "), GET");		
+		final ListCoinTypeResponse response = new ListCoinTypeResponse()
+			// 法律免責聲明
+			.setDisclaimer(
+				"This data was produced from the CoinDesk Bitcoin Price Index (USD). " +
+				"Non-USD currency data converted using hourly conversion rate from openexchangerates.org")
+			.setChartName("Bitcoin");
+		
+		
+		List<Coin> coins = null;
+		try {
+			// Wait for querying for the existing coin types.
+			coins = queryFuture.completable().join();
+			
+			// Create response
+			final ListCoinTypeResponse response = new ListCoinTypeResponse()
+				.setDisclaimer(
+					"This data was produced from the CoinDesk Bitcoin Price Index (USD). " +
+					"Non-USD currency data converted using hourly conversion rate from openexchangerates.org")
+				.setChartName("Bitcoin");
+			
+			// payload
+			response.setBpi(toMap(coins, (c) -> c.getCoinCode()));
+			
+			// sendback to the client
+			return ResponseEntity.ok(response);
+		}
+		catch (Throwable t) {
+			return new ResponseEntity<String>("An error occurred during the query.", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	/**
