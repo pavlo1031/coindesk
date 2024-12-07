@@ -50,6 +50,11 @@ public class CoinService {
         for (Coin c : updateData) {
         	boolean dirty = false;
         	CoinType entity = beforeUpdated.get(c.getCoinCode());
+        	if (entity == null) {
+        		// 略過: 參數coins中包含的無效的幣別資料
+        		//      (原本不存在的幣別)
+        		continue;
+        	}
         	
         	if (c.getSymbol() != null && !c.getSymbol().equals(entity.getSymbol())) {
         		entity.setSymbol(c.getSymbol());
