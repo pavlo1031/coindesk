@@ -61,7 +61,7 @@ public class CoinService {
         		dirty = true;
         	}
         	
-			if (c.getRateFloat() != null && !c.getRateFloat().equals(entity.getRateFloat())) {
+			if (c.getRateFloat() != null && c.getRateFloat().compareTo(entity.getRateFloat()) != 0) {
 				entity.setRateFloat(c.getRateFloat());
 				dirty = true;
         	}
