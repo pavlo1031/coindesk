@@ -1,6 +1,9 @@
 package cathay.coindeskApi.commons.util;
 
 import static cathay.coindeskApi.commons.util.CollectionUtils.contains;
+import static cathay.coindeskApi.commons.util.JsonUtils.getJsonStringPrettyFormat;
+import static cathay.coindeskApi.commons.util.JsonUtils.getObjectMapper;
+import static cathay.coindeskApi.commons.util.MapUtils.of;
 import static cathay.coindeskApi.commons.util.ReflectionUtils.findDeclaredAccessors;
 import static cathay.coindeskApi.commons.util.StringUtils.firstCharToLowercase;
 import static cathay.coindeskApi.commons.util.validate.ValidationUtils.checkCondition;
@@ -9,6 +12,7 @@ import static java.lang.Character.toLowerCase;
 import static java.lang.Character.toUpperCase;
 import static java.util.Arrays.stream;
 
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,12 +23,16 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * 此類別僅為了包裝現有的beans相關的功能 (可能是別的library的實現)
  * 讓它們有額外特性, 例如: bean資料處理完, 會傳回對象
  */
 public class BeanUtils {
 
+	private static ThreadLocal<StringBuilder> threadLocalBuffer = ThreadLocal.withInitial(StringBuilder::new);
+	
 	public static <TargetType> TargetType copyProperties(Object source, TargetType target) {
 		org.springframework.beans.BeanUtils.copyProperties(source, target);
 		return target;
