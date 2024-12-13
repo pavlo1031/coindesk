@@ -4,6 +4,7 @@ import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Arrays.stream;
 import static org.apache.commons.lang3.ObjectUtils.anyNull;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -67,15 +68,13 @@ public class ReflectionUtils {
 			return null;
 		}
 		catch (SecurityException e) {
-			/*
-			 * If a security manager, s, is present and any of thefollowing conditions is met:
-			 * • the caller's class loader is not the same as theclass loader of this class
-			 *   and invocation of s.checkPermission method with RuntimePermission("accessDeclaredMembers")
-			 *   denies access to the declared constructor
-			 *    
-			 * • the caller's class loader is not the same as or anancestor of the class loader
-             *   for the current class andinvocation of s.checkPackageAccess() denies access to the packageof this class 
-			*/
+			// If a security manager, s, is present and any of thefollowing conditions is met:
+			// • the caller's class loader is not the same as theclass loader of this class
+			//   and invocation of s.checkPermission method with RuntimePermission("accessDeclaredMembers")
+			//   denies access to the declared constructor
+			//   
+			//   the caller's class loader is not the same as or anancestor of the class loader
+			//   for the current class andinvocation of s.checkPackageAccess() denies access to the packageof this class 
 			throw e;
 		}
 		return ctor;

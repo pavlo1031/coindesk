@@ -208,7 +208,7 @@ public class CollectionUtils {
 	/**
 	 * @param hitCallback 有找到元素時 會呼叫的callback
 	 */
-	public static <C extends Collection<T>, T> boolean contains(C collection, T elem, Consumer<T> hitCallback) {
+	public static <C extends Collection<T>, T> boolean contains(C collection, T elem, Consumer<? extends T> hitCallback) {
 		return contains(collection, elem, hitCallback, null);
 	}
 	
@@ -223,7 +223,7 @@ public class CollectionUtils {
 	 * @param hitCallback 有找到元素時 會呼叫的callback
 	 * @param missCallback "未"找到元素時 會呼叫的callback
 	 */
-	public static <C extends Collection<T>, T> boolean contains(C collection, T elem, Consumer<T> hitCallback, NoArgConsumer missCallback) {
+	public static <C extends Collection<T>, T> boolean contains(C collection, T elem, Consumer<? extends T> hitCallback, NoArgConsumer missCallback) {
 		Objects.requireNonNull(collection, "The argument 'collection' cannot be null");
 		if (collection.isEmpty()) {
 			if (missCallback != null)
@@ -233,7 +233,7 @@ public class CollectionUtils {
 		
 		boolean found = false;
 		if (found = collection.contains(elem)) {
-			if (hitCallback != null) hitCallback.accept(elem);
+			if (hitCallback != null) ((Consumer<T>) hitCallback).accept(elem);
 		} else {
 			if (missCallback != null) missCallback.accept();
 		}
