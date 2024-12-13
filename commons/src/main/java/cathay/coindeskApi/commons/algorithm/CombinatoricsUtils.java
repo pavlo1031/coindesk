@@ -1,9 +1,9 @@
 package cathay.coindeskApi.commons.algorithm;
 
 import static cathay.coindeskApi.commons.util.validate.ValidationUtils.and;
-import static cathay.coindeskApi.commons.util.validate.Hoc.mustBeNonNull;
-import static cathay.coindeskApi.commons.util.validate.Hoc.numberGreaterThan;
-import static cathay.coindeskApi.commons.util.validate.Hoc.sizeGreaterThan;
+import static cathay.coindeskApi.commons.util.validate.Hoc.Validator.isNotNull;
+import static cathay.coindeskApi.commons.util.validate.Hoc.Validator.numberGreaterThan;
+import static cathay.coindeskApi.commons.util.validate.Hoc.Validator.sizeGreaterThan;
 import static cathay.coindeskApi.commons.util.validate.ValidationUtils.checkCondition;
 import static java.util.stream.Collectors.toMap;
 
@@ -40,7 +40,7 @@ public class CombinatoricsUtils {
     public static <T> Result<T> permutations(int pickCount, List<T> pool) {
     	// check arguments
     	checkCondition(pickCount, numberGreaterThan(0), "參數pickCount必須為大於0");
-    	checkCondition(pool, and(mustBeNonNull("poolElemens"), sizeGreaterThan(0)), "參數poolElemens不可為空");
+    	checkCondition(pool, and(isNotNull("poolElemens"), sizeGreaterThan(0)), "參數poolElemens不可為空");
     	
         List<List<T>> results = new ArrayList<>();
         backtrack(pickCount,
@@ -66,7 +66,7 @@ public class CombinatoricsUtils {
     public static <T> Result<T> combinations(int pickCount, List<T> pool) {
     	// check arguments
     	checkCondition(pickCount, numberGreaterThan(0), "參數pickCount必須為大於0");
-    	checkCondition(pool, and(mustBeNonNull("pool"), sizeGreaterThan(0)), "參數pool不可為空");
+    	checkCondition(pool, and(isNotNull("pool"), sizeGreaterThan(0)), "參數pool不可為空");
     	
         List<List<T>> results = new ArrayList<>();
         backtrack(pickCount,
