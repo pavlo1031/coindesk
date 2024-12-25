@@ -4,11 +4,14 @@ import static cathay.coindeskApi.commons.util.CollectionUtils.toList;
 import static cathay.coindeskApi.commons.util.JsonUtils.getJsonStringPrettyFormat;
 
 import java.util.List;
+import java.util.concurrent.CancellationException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -70,18 +73,33 @@ public class CoindeskApiController {
 		System.out.println("request: " + getJsonStringPrettyFormat(request));
 		System.out.println("- returns updated? " + request.isReturningUpdated());
 		
-		List<Coin> updated = toList(coinService.update(request.getCoins(), request.isReturningUpdated()), Coin.class);
+		ListenableFuture<List<Coin>> updatedFuture = threadPoolTaskExecutor.submitListenable(() -> {
+			return toList(coinService.update(request.getCoins(), request.isReturningUpdated()), Coin.class);
+		});
 		
-		UpdateCoinTypeResponse response = new UpdateCoinTypeResponse();
-		if (request.isReturningUpdated()) {
-			response.addBpi(updated);
+		List<Coin> updated = null;
+		try {
+			// Process request
+			updated = updatedFuture.completable().join();
+			
+			// API result
+			UpdateCoinTypeResponse response = new UpdateCoinTypeResponse();
+			if (request.isReturningUpdated()) {
+				response.addBpi(updated);
+			}
+			else {
+				response.setUpdated(null);
+				response.setRowsAffected(updated.size());
+			}
+			return ResponseEntity.ok(response);
 		}
-		else {
-			// 保證完全不會出現updated藍位
-			response.setUpdated(null);
-			response.setRowsAffected(updated.size());
+		catch (CancellationException e) {
+			return new ResponseEntity<String>("This update operation was cancelled for some reason.", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		return ResponseEntity.ok(response);
+		// if an exception occurred during join()
+		catch (Throwable t) {
+			return new ResponseEntity<String>("An error occurred during the update operation.", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	
