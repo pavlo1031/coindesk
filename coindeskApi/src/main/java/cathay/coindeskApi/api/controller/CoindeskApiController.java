@@ -6,6 +6,7 @@ import static cathay.coindeskApi.commons.util.CollectionUtils.toMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import org.springframework.util.concurrent.ListenableFuture;
 
 import cathay.coindeskApi.api.service.CoinService;
 import cathay.coindeskApi.api.vo.CoinTypeRequest;
@@ -39,13 +42,12 @@ public class CoindeskApiController {
 	 */
 	@GetMapping(path = "list", consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
 	public ResponseEntity<?> list(@RequestBody(required = false) ListCoinTypeRequest request) {
-		System.out.println("list(" + ((request != null)? "ListCoinTypeRequest":"") + "), GET");		
-		final ListCoinTypeResponse response = new ListCoinTypeResponse()
-			// 法律免責聲明
-			.setDisclaimer(
-				"This data was produced from the CoinDesk Bitcoin Price Index (USD). " +
-				"Non-USD currency data converted using hourly conversion rate from openexchangerates.org")
-			.setChartName("Bitcoin");
+		System.out.println("list(" + ((request != null)? "ListCoinTypeRequest":"") + "), GET");
+
+		// Put the job into a task and submit it to thread pool
+		ListenableFuture<List<Coin>> queryFuture = threadPoolTaskExecutor.submitListenable(() -> {
+			return toList(coinService.getAllCoinTypes(), Coin.class);
+		});
 		
 		
 		List<Coin> coins = null;
