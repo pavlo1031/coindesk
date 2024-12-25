@@ -3,6 +3,8 @@ package cathay.coindeskApi.api.vo;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
@@ -21,6 +23,7 @@ public class AddCoinTypeRequest extends CoinTypeRequest {
 	private List<Coin> coins = new ArrayList<Coin>();
 	
 	@JsonProperty("returningAdded")
+	@Value("${cathay.interview.coindeskApi.api.returning_result_affected:false}")
 	private Boolean returningAdded;
 
 	public Boolean isReturningAdded() {
