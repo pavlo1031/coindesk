@@ -1,9 +1,9 @@
 package cathay.coindeskApi.api.controller;
 
-
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -18,7 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import cathay.coindeskApi.api.service.CoinService;
 import cathay.coindeskApi.api.vo.CoinTypeRequest;
 import cathay.coindeskApi.api.vo.CoinTypeResponse;
-import cathay.coindeskApi.api.vo.Coin;
+import cathay.coindeskApi.api.vo.DeleteCoinTypeRequest;
+import cathay.coindeskApi.api.vo.DeleteCoinTypeResponse;
 
 @RestController
 @RequestMapping("/api/v1.0.0/coin")
@@ -68,18 +69,35 @@ public class CoindeskApiController {
 		return ResponseEntity.ok(response);
 	}
 	
-	
 	/**
 	 * 刪除幣種資料
 	 * 
 	 * @param coinCode 幣別代號
 	 */
 	@DeleteMapping(path = "delete", consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<?> delete(@RequestBody CoinTypeRequest request) {	
+	public ResponseEntity<?> delete(@RequestBody DeleteCoinTypeRequest request) {	
 		System.out.println("delete(), DELETE");
-		CoinTypeResponse response = new CoinTypeResponse()
-			.setData(request)
-			.setMsg("後端建構中, 已收到待刪除的幣別代號");
-		return ResponseEntity.ok(response);
+		System.out.println("- coin code: " + request.getCoinCodes());
+		System.out.println("- returns deleted? " + request.isReturningDeleted());
+		
+		try {
+			// API result
+			DeleteCoinTypeResponse response = new DeleteCoinTypeResponse();
+			if (request.isReturningDeleted()) {
+				// 傳回 "成功被刪除"的幣別
+				List<String> coinCodesDeleted = coinService.deleteAndReturn(request.getCoinCodes());
+				response.addCoinCodes(coinCodesDeleted);
+			}
+			else {
+				// 僅傳回 "成功被刪除" 的筆數
+				int rowsDeleted = coinService.delete(request.getCoinCodes());
+				response.setDeleted(null);
+				response.setRowsAffected(rowsDeleted);
+			}
+			return ResponseEntity.ok(response);
+		}
+		catch (Throwable t) {
+			return new ResponseEntity<String>("An error occurred during the update operation.", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }
