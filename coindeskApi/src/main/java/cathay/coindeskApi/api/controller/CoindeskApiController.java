@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -80,17 +81,30 @@ public class CoindeskApiController {
 		System.out.println("- coin code: " + request.getCoinCodes());
 		System.out.println("- returns deleted? " + request.isReturningDeleted());
 		
-		try {
-			// API result
-			DeleteCoinTypeResponse response = new DeleteCoinTypeResponse();
+		ListenableFuture<?> deletedFuture = threadPoolTaskExecutor.submitListenable(() -> {
 			if (request.isReturningDeleted()) {
 				// 傳回 "成功被刪除"的幣別
-				List<String> coinCodesDeleted = coinService.deleteAndReturn(request.getCoinCodes());
+				return coinService.deleteAndReturn(request.getCoinCodes());
+			} else {
+				// 僅傳回 "成功被刪除" 的筆數
+				return coinService.delete(request.getCoinCodes());
+			}
+		});
+		
+		
+		try {
+			// Wait for executing the 'delete' operation
+			deletedFuture.completable().join();
+			
+			// API result
+			// (here the result is available)
+			DeleteCoinTypeResponse response = new DeleteCoinTypeResponse();
+			if (request.isReturningDeleted()) {
+				List<String> coinCodesDeleted = (List<String>) deletedFuture.get();
 				response.addCoinCodes(coinCodesDeleted);
 			}
 			else {
-				// 僅傳回 "成功被刪除" 的筆數
-				int rowsDeleted = coinService.delete(request.getCoinCodes());
+				int rowsDeleted = (Integer) deletedFuture.get();
 				response.setDeleted(null);
 				response.setRowsAffected(rowsDeleted);
 			}
