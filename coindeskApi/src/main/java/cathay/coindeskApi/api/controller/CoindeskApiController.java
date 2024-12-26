@@ -10,9 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -59,30 +61,41 @@ public class CoindeskApiController {
 	public ResponseEntity<?> add(@RequestBody AddCoinTypeRequest request) {
 		System.out.println("add() POST, 接受JSON資料");
 		System.out.println("request: " + getJsonStringPrettyFormat(request));
+		System.out.println("- returns updated? " + request.isReturningAdded());
 		
-		// perform add
-		List<Coin> addedCoinTypes = toList(coinService.addCoinTypes(request.getCoins()), Coin.class);
+		ListenableFuture<List<Coin>> addedFuture = threadPoolTaskExecutor.submitListenable(() -> {
+			return toList(coinService.addCoinTypes(request.getCoins()), Coin.class);
+		});
 		
-		// 篩出未加入的幣別
-		List<Coin> coinCodesNotAdded = new ArrayList<Coin>(request.getCoins());
-		coinCodesNotAdded.removeAll(addedCoinTypes);
-				
-		AddCoinTypeResponse response = new AddCoinTypeResponse();		
-		// 決定是否回傳新增的幣別資料
-		if (request.isReturningAdded()) {
-			response.addBpi(addedCoinTypes);	
-		} else {
-			response.setBpi(null);
+		List<Coin> addedCoinTypes = null;
+		try {
+			// 取得執行結果: 新增幣別
+			addedCoinTypes = addedFuture.completable().join();
+			
+			// 篩出"未新增"的幣別
+			// (可能是本來就存在, 或是新增失敗)
+			List<Coin> coinCodesNotAdded = new ArrayList<Coin>(request.getCoins());
+			coinCodesNotAdded.removeAll(addedCoinTypes);
+			
+			
+			// Create response
+			AddCoinTypeResponse response = new AddCoinTypeResponse();
+			if (request.isReturningAdded()) {
+				response.addBpi(addedCoinTypes);	
+			} else {
+				response.setBpi(null);
+				response.setRowsAffected(addedCoinTypes.size());
+			}
+			
+			// 未新增的幣別代號, 列在msg欄位中
+			if (coinCodesNotAdded.size() > 0)
+				response.setMsg("幣別代號已存在, 無法新增: " + join(map(coinCodesNotAdded, (c) -> quoteString(c.getCoinCode())), ", "));
+
+			return ResponseEntity.ok(response);
 		}
-		
-		// 實際新增的幣別筆數
-		response.setRowsAffected(addedCoinTypes.size());
-		
-		// 未新增的幣別代號, 列在msg欄位中
-		if (coinCodesNotAdded.size() > 0) { 
-			response.setMsg("幣別代號已存在, 無法新增: " + join(map(coinCodesNotAdded, (c) -> quoteString(c.getCoinCode())), ", "));
-		}
-		return ResponseEntity.ok(response);
+		catch (Throwable t) {
+			return new ResponseEntity<String>("An error occurred during the 'Add' operation.", HttpStatus.INTERNAL_SERVER_ERROR);
+		}	
 	}
 
 	
