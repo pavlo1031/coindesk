@@ -1,9 +1,15 @@
 package cathay.coindeskApi.api.controller;
 
+import static cathay.coindeskApi.commons.util.CollectionUtils.map;
 import static cathay.coindeskApi.commons.util.CollectionUtils.toList;
+import static cathay.coindeskApi.commons.util.CollectionUtils.toMap;
 import static cathay.coindeskApi.commons.util.JsonUtils.getJsonStringPrettyFormat;
 
+import static cathay.coindeskApi.commons.util.StringUtils.quoteString;
+import static org.apache.commons.lang3.StringUtils.join;
+
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CancellationException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,20 +83,28 @@ public class CoindeskApiController {
 			return toList(coinService.update(request.getCoins(), request.isReturningUpdated()), Coin.class);
 		});
 		
-		List<Coin> updated = null;
 		try {
-			// Process request
-			updated = updatedFuture.completable().join();
+			// Wait for processing request
+			updatedFuture.completable().join();
+			
+			// Get the result
+			final Map<String, Coin> updated = toMap(updatedFuture.get(), (c) -> c.getCoinCode());
 			
 			// API result
 			UpdateCoinTypeResponse response = new UpdateCoinTypeResponse();
 			if (request.isReturningUpdated()) {
-				response.addBpi(updated);
+				response.addBpi(updated.values());
 			}
 			else {
 				response.setUpdated(null);
 				response.setRowsAffected(updated.size());
 			}
+			
+			// "未成功更新" 的幣別代號, 列在msg欄位中:
+			List<String> coinCodesNotUpdated = map(request.getCoins(), (c) -> !updated.containsKey(c.getCoinCode()), (c) -> c.getCoinCode());
+			if (coinCodesNotUpdated.size() > 0)
+				response.setMsg("幣別資料未更新: " + join(map(coinCodesNotUpdated, (coinCode) -> quoteString(coinCode)), ", "));
+
 			return ResponseEntity.ok(response);
 		}
 		catch (CancellationException e) {
