@@ -1,5 +1,10 @@
 package cathay.coindeskApi.api.controller;
 
+import static cathay.coindeskApi.commons.util.CollectionUtils.filter;
+import static cathay.coindeskApi.commons.util.CollectionUtils.map;
+import static cathay.coindeskApi.commons.util.StringUtils.quoteString;
+import static org.apache.commons.lang3.StringUtils.join;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,10 +88,10 @@ public class CoindeskApiController {
 		
 		ListenableFuture<?> deletedFuture = threadPoolTaskExecutor.submitListenable(() -> {
 			if (request.isReturningDeleted()) {
-				// 傳回 "成功被刪除"的幣別
+				// 傳回 "成功被刪除" 的幣別
 				return coinService.deleteAndReturn(request.getCoinCodes());
 			} else {
-				// 僅傳回 "成功被刪除" 的筆數
+				// 僅傳回 "成功被刪除" 的筆數, 但無幣別詳細資料
 				return coinService.delete(request.getCoinCodes());
 			}
 		});
@@ -97,11 +102,16 @@ public class CoindeskApiController {
 			deletedFuture.completable().join();
 			
 			// API result
-			// (here the result is available)
 			DeleteCoinTypeResponse response = new DeleteCoinTypeResponse();
+			
 			if (request.isReturningDeleted()) {
-				List<String> coinCodesDeleted = (List<String>) deletedFuture.get();
+				final List<String> coinCodesDeleted = (List<String>) deletedFuture.get();
 				response.addCoinCodes(coinCodesDeleted);
+				
+				// "未成功刪除" 的幣別代號, 列在msg欄位中:
+				List<String> coinCodesNotDeleted = filter(request.getCoinCodes(), (coinCode) -> coinCodesDeleted.indexOf(coinCode) == -1);
+				if (coinCodesNotDeleted.size() > 0)
+					response.setMsg("幣別無法刪除: " + join(map(coinCodesNotDeleted, (coinCode) -> quoteString(coinCode)), ", "));
 			}
 			else {
 				int rowsDeleted = (Integer) deletedFuture.get();
