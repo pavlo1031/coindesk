@@ -2,6 +2,7 @@ package cathay.coindeskApi.api.controller;
 
 import static cathay.coindeskApi.commons.util.CollectionUtils.toList;
 import static cathay.coindeskApi.commons.util.CollectionUtils.toMap;
+import static org.apache.commons.lang3.ObjectUtils.allNotNull;
 
 import java.util.List;
 
@@ -26,6 +27,7 @@ import cathay.coindeskApi.api.vo.CoinTypeResponse;
 import cathay.coindeskApi.api.vo.Coin;
 import cathay.coindeskApi.api.vo.ListCoinTypeRequest;
 import cathay.coindeskApi.api.vo.ListCoinTypeResponse;
+import cathay.coindeskApi.commons.util.JsonUtils;
 
 @RestController
 @RequestMapping("/api/v1.0.0/coin")
@@ -41,11 +43,15 @@ public class CoindeskApiController {
 	 * list 取得所有幣別
 	 */
 	@GetMapping(path = "list", consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<?> list(@RequestBody(required = false) ListCoinTypeRequest request) {
-		System.out.println("list(" + ((request != null)? "ListCoinTypeRequest":"") + "), GET");
+	public ResponseEntity<?> list(@RequestBody(required = false) final ListCoinTypeRequest request) {
+		System.out.println("\nlist(" + ((request != null)? "ListCoinTypeRequest":"") + "), GET");
+		System.out.println("- request: " + ((request != null)? JsonUtils.getJsonStringPrettyFormat(request) : null) + "\n");
 
 		// Put the job into a task and submit it to thread pool
 		ListenableFuture<List<Coin>> queryFuture = threadPoolTaskExecutor.submitListenable(() -> {
+			if (request != null && allNotNull(request.getPageNumber(), request.getPageSize()) ) {
+				return toList(coinService.getAllCoinTypes(request.getPageNumber(), request.getPageSize()), Coin.class);	
+			}
 			return toList(coinService.getAllCoinTypes(), Coin.class);
 		});
 		

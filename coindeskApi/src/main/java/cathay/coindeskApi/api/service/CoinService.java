@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import cathay.coindeskApi.api.entity.CoinType;
@@ -22,6 +23,10 @@ public class CoinService {
     
     public List<CoinType> getAllCoinTypes() {
         return coinTypeRepository.findAll();
+    }
+    
+    public List<CoinType> getAllCoinTypes(int pageNumber, int pageSize) {
+        return coinTypeRepository.findAll(PageRequest.of(pageNumber, pageSize)).toList();
     }
     
     public Coin findCoinType(String code) {
