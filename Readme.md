@@ -21,3 +21,5 @@
 - API目前可接收參數形式: application/json
 - 欲新增幣別資料，可參考以下網站
   https://www.ifreesite.com/currency.htm
+- JDK8升級到JDK11:
+  如果有問題, 請試著執行maven update
