@@ -2,6 +2,7 @@ package cathay.coindeskApi.commons.util.validate;
 
 import static cathay.coindeskApi.commons.util.MultiElementUtils.getLength;
 import static cathay.coindeskApi.commons.util.StringUtils.quoteString;
+import static cathay.coindeskApi.commons.util.DateUtils.formatDate;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isNoneEmpty;
 
@@ -9,7 +10,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -293,6 +296,84 @@ public class Hoc {
 					if (n == null)
 						return false;
 					return ((Predicate<Number>) condition).test(n);
+				});
+			}
+			finally {
+				buffer.setLength(0);
+			}
+		}
+		
+		///////////////////////////////// 日期時間 /////////////////////////////////
+		
+		public static Predicate isDateBetween(final Date startDate, final Date endDate) {
+			return isDateBetween(null, startDate, endDate);
+		}
+		
+		public static Predicate isDateBetween(final String variableName, final Date startDate, final Date endDate) {
+			Objects.requireNonNull(startDate, "'startDate' argument must not be null");
+			Objects.requireNonNull(endDate, "'endDate' argument must not be null");
+			if (startDate.getTime() <= endDate.getTime() != true)
+				throw new IllegalArgumentException("起始日期startDate必須早於endDate");
+			
+			StringBuilder buffer = threadLocalBuffer.get().append("日期時間參數")
+														  .append(isNoneEmpty(variableName) ? "%s" : "").append("必須介於")
+														  .append(formatDate(startDate)).append(" and ").append(formatDate(endDate));
+			try {
+				return doReturnHocFlow(variableName, buffer.toString(), (Date date) -> {
+					return date.getTime() >= startDate.getTime() && date.getTime() < endDate.getTime();
+				});	
+			}
+			finally {
+				buffer.setLength(0);
+			}
+		}
+		
+		
+		public static Predicate isDateBefore(final Date before) { return isDateBefore(null, before, false); }
+		
+		public static Predicate isDateBefore(String variableName, final Date before) { return isDateBefore(variableName, before, false); }
+		
+		public static Predicate isDateBeforeInclusive(final Date before) { return isDateBefore(null, before, true); }
+		
+		public static Predicate isDateBeforeInclusive(String variableName, final Date before) { return isDateBefore(variableName, before, true); }
+		
+		public static Predicate isDateBefore(String variableName, final Date before, final boolean inclusive) {
+			Objects.requireNonNull(before, "The argument 'before' must not be null");
+			
+			StringBuilder buffer = threadLocalBuffer.get().append("日期時間參數")
+														  .append(isNoneEmpty(variableName) ? "%s" : "")
+														  .append(", 必須早於").append(formatDate(before));
+			try {
+				return doReturnHocFlow(variableName, buffer.toString(), (Date date) -> {
+					if (inclusive)
+						return date.getTime() <= before.getTime();
+					return date.getTime() < before.getTime();
+				});	
+			}
+			finally {
+				buffer.setLength(0);
+			}
+		}
+		
+		public static Predicate isDateAfter(final Date after) { return isDateAfter(null, after, false); }
+		
+		public static Predicate isDateAfter(String variableName, final Date after) { return isDateAfter(variableName, after, false); }
+		
+		public static Predicate isDateAfterInclusive(final Date after) { return isDateAfter(null, after, true); }
+		
+		public static Predicate isDateAfterInclusive(String variableName, final Date after) { return isDateAfter(variableName, after, true); }
+		
+		public static Predicate isDateAfter(String variableName, final Date after, final boolean inclusive) {
+			Objects.requireNonNull(after, "The argument 'after' must not be null");
+			
+			StringBuilder buffer = threadLocalBuffer.get().append("日期時間參數")
+														  .append(isNoneEmpty(variableName) ? "%s" : "")
+														  .append(", 必須晚於").append(formatDate(after));
+			try {
+				return doReturnHocFlow(variableName, "message", (Date date) -> {
+					if (inclusive)
+						return date.getTime() > after.getTime();
+					return date.getTime() >= after.getTime();
 				});
 			}
 			finally {

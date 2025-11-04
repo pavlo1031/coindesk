@@ -3,7 +3,9 @@ package cathay.coindeskApi.commons.util.function;
 import static cathay.coindeskApi.commons.util.MultiElementUtils.getLength;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
 
 import cathay.coindeskApi.commons.util.MultiElementUtils;
 import cathay.coindeskApi.commons.util.NumberUtils;
@@ -159,6 +161,45 @@ public class Hoc {
 				return false;
 			return collection.stream().anyMatch((elem) -> data.equals(elem));
 		};
+	}
+	
+	///////////////////////////////// 日期時間 /////////////////////////////////
+
+	public static Predicate isDateBetween(final Date startDate, final Date endDate) {
+		Objects.requireNonNull(startDate, "'startDate' argument must not be null");
+		Objects.requireNonNull(endDate, "'endDate' argument must not be null");
+		if (startDate.getTime() <= endDate.getTime() != true)
+			throw new IllegalArgumentException("起始日期startDate必須早於endDate");
+		
+		return (Predicate<Date>) (Date date) -> {
+			return date.getTime() >= startDate.getTime() && date.getTime() < endDate.getTime();
+		};
+	}
+
+	public static Predicate isDateBefore(final Date before) { return isDateBefore(before, false); }
+	
+	public static Predicate isDateBeforeInclusive(final Date before) { return isDateBefore(before, true); }
+	
+	public static Predicate isDateBefore(final Date before, final boolean inclusive) {
+		Objects.requireNonNull(before, "The argument 'before' must not be null");
+		return (Predicate<Date>) ((Date date) -> {
+			if (inclusive)
+				return date.getTime() <= before.getTime();
+			return date.getTime() <= before.getTime();
+		});
+	}
+	
+	public static Predicate isDateAfter(final Date after) { return isDateAfter(after, false); }
+	
+	public static Predicate isDateInclusive(final Date after) { return isDateAfter(after, true); }
+	
+	public static Predicate isDateAfter(final Date after, final boolean inclusive) {
+		Objects.requireNonNull(after, "The argument 'after' must not be null");
+		return (Predicate<Date>) ((Date date) -> {
+			if (inclusive)
+				return date.getTime() > after.getTime();
+			return date.getTime() >= after.getTime();
+		});
 	}
 	
 	//////////////////////////// 容器 (map) /////////////////////////////
